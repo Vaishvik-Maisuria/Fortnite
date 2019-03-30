@@ -11,7 +11,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            view = "login",
+            
             isGameStarted: false,
             isNotLogedIn: true,
         };
@@ -21,7 +21,7 @@ class App extends Component {
     // This method will be sent to the child component
     Loginhandler() {
         this.setState({
-            view = "game",
+           
             isGameStarted: true,
             isNotLogedIn: false
         });
