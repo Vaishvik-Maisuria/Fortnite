@@ -248,6 +248,45 @@ app.put('/api/user/:user', function (req, res) {
 });
 
 
+// get user and password
+app.get('/api/user/:user', function (req, res) {
+	// console.log(JSON.stringify(req));
+	// var user = req.body.user;
+	// var password = req.body.password;
+
+	var user = req.params.user;
+	var password = req.query.password;
+
+	var result = { error: {} , success:false};
+	if(user==""){
+		result["error"]["user"]="user not supplied";
+	}
+	if(password==""){
+		result["error"]["password"]="password not supplied";
+	}
+	if(isEmptyObject(result["error"])){
+		let sql = 'SELECT * FROM user WHERE user=? and password=?;';
+		db.get(sql, [user, password], function (err, row){
+  			if (err) {
+				res.status(500); 
+    				result["error"]["db"] = err.message;
+  			} else if (row) {
+				res.status(200);
+				result.data = row;
+				result.success = true;
+			} else {
+				res.status(401);
+				result.success = false;
+    				result["error"]["login"] = "login failed";
+			}
+			res.json(result);
+		});
+	} else {
+		res.status(400);
+		res.json(result);
+	}
+});
+
 
 
 app.listen(3001, () =>

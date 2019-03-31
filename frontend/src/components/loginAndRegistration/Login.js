@@ -33,13 +33,7 @@ class Login extends Component {
 			dataType: "json", 
 			data: JSON.stringify({ "user": this.state.user , "password": this.state.password })
 		}).done(function(data, text_status, jqXHR){
-			console.log("Move to game");
-			this.setState((prevState, props) => ({
-				user: data.user,
-				password: data.password,
-				
-			}));
-			this.props.view();
+			this.props.view(this.state.user,this.state.password);
 		}.bind(this)).fail(function(err){
 			let response = {};
 			if("responseJSON" in err)response = err.responseJSON;

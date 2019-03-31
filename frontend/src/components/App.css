@@ -46,6 +46,11 @@
   text-align: center
 }
 
+.gameboard_container {
+  text-align: center;
+  padding-top: 10px
+}
+
 .box_container {
   display: inline-block;
   flex-direction: column;

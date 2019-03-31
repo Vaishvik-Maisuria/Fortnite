@@ -77,9 +77,9 @@ class Registration extends Component {
 					</div>
 					{/* <div className="form-row">
 						<label>skill</label>
-						<input type="radio" data-name="skill" name="skill" value="beginner"   checked={true}>beginner</input>
-						<input type="radio" data-name="skill" name="skill" value="intermediate"   checked={false}>intermediate</input>
-						<input type="radio" data-name="skill" name="skill" value="advanced"  checked={false}>advanced</input>
+						<input type="radio" data-name="skill" name="skill" value="beginner" checked={true}>beginner</input>
+						<input type="radio" data-name="skill" name="skill" value="intermediate" checked={false}>intermediate</input>
+						<input type="radio" data-name="skill" name="skill" value="advanced" checked={false}>advanced</input>
 					</div> */}
 					<div className={styles.form_row} name="birthday">
 						<label>Birthday</label>
