@@ -32,19 +32,17 @@ class Profile extends Component {
     }).done(function (data, text_status, jqXHR) {
       // console.log(text_status);
       // console.log(jqXHR.status);
-      console.log(data.user);
-      console.log(data.password);
       this.setState({
-        user: data.user,
-        password: data.password,
-        confirmpassword: data.confirmpassword,
-        skill: data.skill,
-        year: data.year,
-        month: data.month,
-        day: data.day,
-        playmorning: data.playmorning,
-        playafternoon: data.playafternoon,
-        playevening: data.playevening
+        user: data.data.user,
+        password: data.data.password,
+        confirmpassword: data.data.password,
+        skill: data.data.skill,
+        year: data.data.year,
+        month: data.data.month,
+        day: data.data.day,
+        playmorning: data.data.playmorning,
+        playafternoon: data.data.playafternoon,
+        playevening: data.data.playevening
       });
 
 

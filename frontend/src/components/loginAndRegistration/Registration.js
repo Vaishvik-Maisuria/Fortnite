@@ -86,12 +86,12 @@ class Registration extends Component {
 					<div className={styles.form_row} name="confirmpassword">
 						<label>confirm</label><input onChange={this.handleChange} type="password" name="confirmpassword" placeholder="Confirm Password" />
 					</div>
-					{/* <div className="form-row">
-						<label>skill</label>
-						<input type="radio" data-name="skill" name="skill" value="beginner" checked={true}>beginner</input>
-						<input type="radio" data-name="skill" name="skill" value="intermediate" checked={false}>intermediate</input>
-						<input type="radio" data-name="skill" name="skill" value="advanced" checked={false}>advanced</input>
-					</div> */}
+					<div className={styles.form_row}>
+						{/* <label>skill</label> */}
+						{/* <input type="radio" data-name="skill" name="skill" value="beginner" checked={true}>beginner</input> */}
+						{/* <input type="radio" data-name="skill" name="skill" value="intermediate" checked={false}>intermediate</input>
+						<input type="radio" data-name="skill" name="skill" value="advanced" checked={false}>advanced</input> */}
+					</div>
 					<div className={styles.form_row} name="birthday">
 						<label>Birthday</label>
 						<input onChange={this.handleChange} type="number" min="1900" max="2100" name="year" placeholder="year" />
