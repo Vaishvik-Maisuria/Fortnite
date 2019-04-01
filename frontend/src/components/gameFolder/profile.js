@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
+import styles2 from '../loginAndRegistration/loginAndRegistration.css'
 import $ from 'jquery'
 
 
@@ -93,20 +94,21 @@ class Profile extends Component {
   }
 
   render() {
+    
     console.log(this.state.user);
     return (
       <div className={styles.box_container}>
         <div className={styles.box_controller}>
-          <div className={styles.ui_top}>
+          <div className={styles2.ui_top}>
             <h2>Profile Page</h2>
-            <div className={styles.form_top}>
+            <div className={styles2.form_top}>
               <div className={styles.form_row} name="user">
                 <label>user</label><input onChange={this.handleChange} type="text" id="user" data-name="user" placeholder={this.state.user} />
               </div>
-              <div className={styles.form_row} name="password">
+              <div className={styles2.form_row} name="password">
                 <label>password</label><input onChange={this.handleChange} type="password" id="password" data-name="password" placeholder={this.state.password} />
               </div>
-              <div className={styles.form_row} name="confirmpassword">
+              <div className={styles2.form_row} name="confirmpassword">
                 <label>confirm</label><input onChange={this.handleChange} type="password" id="confirmpassword" data-name="confirmpassword" placeholder={this.state.confirmpassword} />
               </div>
               {/* <div className="form-row">
@@ -115,7 +117,7 @@ class Profile extends Component {
 						<input type="radio" data-name="skill" name="skill" value="intermediate" checked={false}>intermediate</input>
 						<input type="radio" data-name="skill" name="skill" value="advanced" checked={false}>advanced</input>
 					</div> */}
-              <div className={styles.form_row} name="birthday">
+              <div className={styles2.form_row} name="birthday">
                 <label>Birthday</label>
                 <input onChange={this.handleChange} type="number" min="1900" max="2100" id="year" data-name="year" placeholder={this.state.year} />
                 <select onChange={this.handleChange} id="month" data-name="month">
@@ -140,7 +142,7 @@ class Profile extends Component {
 						<input type="checkbox" data-name="playafternoon" value="yes" >afternoon</input>
 						<input type="checkbox" data-name="playevening" value="yes" >evening</input>
 					</div> */}
-              <div class="form-row">
+              <div className={styles2.form_row}>
                 <input type="submit" id="updateProfileSubmit" value="Update" onClick={this.api_profile.bind(this)} onclick="gui_profile();" />
               </div>
               {/* <thead>

@@ -16,7 +16,7 @@ class Instructions extends Component {
 
     return (
       <div className={styles.gameboard_container}>
-        <div className={styles.box_controller}>
+   
           <h2> Instructions Page </h2>
           <div class="form-top">
             <ul>
@@ -27,7 +27,7 @@ class Instructions extends Component {
             </ul>
           </div>
         </div>
-      </div>
+ 
     );
   }
 }
