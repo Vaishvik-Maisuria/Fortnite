@@ -82,13 +82,7 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    this.getProfile();
-
-    // putDataIntoProfileForm
-    // document.getElementById('user').className = "";
-    // document.getElementById('homeHyperlink').className = "";
-    // document.getElementById('profileHyperlink').className = "active";
-
+    this.getProfile(); 
   }
 
   render() {
