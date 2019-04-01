@@ -24,10 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	socket = new WebSocket("ws://localhost:8001");
 	socket.onopen = function (event) {
-		// const check = randint(100)
-		// sendData(check)
-		//send in a new Data
-		// id = ID()
+		
 		console.log("Sending in id", id);
 		
 		const data = {
@@ -41,18 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	socket.onmessage = function (event) {	
 		//when a message has been relased
-		// console.log("in on message");
 		var item = JSON.parse(event.data)
-		// console.log(item);
-		
-		// console.log(item);
-		// console.log("id:", item.id);
-		// console.log(item.id);
-		
-		// const check = item.playerList[id]
-		// console.log(check);
-		
-		// id = item.id
+	
 		config = item.data
 		const ids = config[0].stage.playersID
 		console.log(ids);
@@ -76,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 			keyPressData.x = moveMap2[key][0]
 			keyPressData.y = moveMap2[key][1]
+			keyPressData['id'] = id
+			keyPressData['playerIndex'] = playerIndex
 	
 			if (key == 'e')
 				keyPressData.type = 'pickUp'
@@ -104,6 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		var mousePos = getMousePos(canvas2, event);
 		// console.log(mousePos.x + ',' + mousePos.y);
 		mouseMovementData = {
+			playerIndex: playerIndex,
+			id: id,
 			type: 'mouseMovement',
 			x: mousePos.x,
 			y: mousePos.y
@@ -112,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		mouseMove(mousePos.x, mousePos.y, clientPlayer)
 
 	}, false);
+
 	// canvas2.addEventListener("click", function (event) {
 	// 	var mousePos = getMousePos(canvas2, event);
 	// 	// console.log(mousePos.x + ',' + mousePos.y);
@@ -126,11 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 	// stage.mouseClick(mousePos.x, mousePos.y);
 	// }, false);
 
-	// setInterval(function() {
-	// 	const data = JSON.stringify(mouseMovementData)
-	// 	socket.send(data);
+	setInterval(function() {
+		const data = JSON.stringify(mouseMovementData)
+		socket.send(data);
 	
-	// }, 400)
+	}, 400)
 	
 	
 
@@ -146,9 +138,12 @@ function draw(context) {
 	
 	
 	var player = config[playerIndex]
-	// if (clientPlayer == null){
-	// 	clientPlayer = config[playerIndex]
-	// }
+
+	if (clientPlayer == null){
+		clientPlayer = config[playerIndex]
+	}else{
+		clientPlayer.position = player.position
+	}
 	console.log('player id ', player.id);
 	
 	let playerPosition = toInt(player.position.x, player.position.y);
@@ -298,42 +293,32 @@ function drawBox(context, box) {
 }
 
 function drawPlayer(context, player) {
-	if (id == player.id){
-		if (clientPlayer == null){
-			clientPlayer = player
-		}
-	}else{
-		clientPlayer = player
-	}
-
-	// console.log('client', clientPlayer.turretDirection);
 	
-
 	context.fillStyle = player.colour;
 	context.beginPath(); 
 	var intPosition = toInt(player.position.x, player.position.y);
 	context.arc(intPosition.x, intPosition.y, player.radius, 0, 2 * Math.PI, false); 
-	context.fill();   
-	
-	// clientPlayer.position = player.position
-	var turretPos = null
+	context.fill();
+
 	if (id == player.id){
-		//Client Player
-		clientPlayer.position = player.position
+		//we will use client player for mouseMovement
 		var turretPos = getTurretPosition()
-		console.log('in here');
-		
-	}else {
+		drawTurret(context, clientPlayer, turretPos)
+	}else{
+		//other Players
 		var turretPos = player.turtPosition
-	} 
-	// var turretPos = getTurretPosition()
-	// var turretPos = player.turtPosition
-	turretPos =  toInt(turretPos.x, turretPos.y);
-	console.log(turretPos);
-	context.beginPath(); 
-	context.arc(turretPos.x, turretPos.y, player.radius/2, 0, 2 * Math.PI, false); 
-	context.fill();   
+		turretPos =  toInt(turretPos.x, turretPos.y);
+		drawTurret(context, player, turretPos)
+	}
 	
+}
+
+function drawTurret(context, player, turretPos){
+
+	console.log(turretPos);
+	context.beginPath();
+	context.arc(turretPos.x, turretPos.y, player.radius/2, 0, 2 * Math.PI, false); 
+	context.fill();
 }
 
 function drawBullet(context, bullet) {

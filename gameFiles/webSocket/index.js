@@ -153,23 +153,21 @@ function handleClientAction(data){
 		case 'pickup':
 			console.log("-------------------------------picking up");
 			mainStage.player.setPickup(true);
-			// mainStage.step()
 			break;
 		case 'movement':
 			console.log('---------------------------- Key Movement');
-			mainStage.player.setDirection(data.x, data.y);
-			//after setting the direction we have to use step
-			// mainStage.step()
+			//now we need to set the direction with a mainStage method
+			// mainStage.player.setDirection(data.x, data.y);
+			mainStage.setDirectionPlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseMovement':
 			console.log('*--------------------------- Mouse Cursor Movement');
-			mainStage.mouseMove(data.x, data.y);
-			// mainStage.step()
+			// mainStage.mouseMove(data.x, data.y);
+			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseClick':
 			console.log('---------------------------- Mouse Click');
 			mainStage.mouseClick(data.x, data.y)
-			// mainStage.step()
 			break
 		default:
 			break;

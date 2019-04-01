@@ -59,8 +59,8 @@ class Stage {
 			var b = new Box(this, s.position, s.colour,40);
 			this.addActor(b);
 		}
-
 	}
+	
 	randomState(){
 		var red=randint(255), green=randint(255), blue=randint(255), alpha = Math.random();
 		var x=Math.floor((Math.random()*this.width)),
@@ -74,21 +74,21 @@ class Stage {
 		}
 	}
 	
-	// Map an canvas coordinates to world coordinates
-	mapCanvasToWorld(canvasPosition){
-		var halfCanvas = (new Pair(this.canvasWidth/2, this.canvasHeight/2)).toInt();
-		var playerPosition = this.player.position.toInt();
+	/** Handle the mouse movement on the stage in canvas coordinates **/
+	mouseMovePlayer(x,y, playerIndex){
+		var canvasPosition=new Pair(x,y);
+		var worldPosition = this.mapCanvasToWorldPlayer(canvasPosition, playerIndex)
+		this.actors[playerIndex].pointTurret(worldPosition)
+	}
 
+	// Map an canvas coordinates to world coordinates
+	mapCanvasToWorldPlayer(canvasPosition, playerIndex){
+		var halfCanvas = (new Pair(this.canvasWidth/2, this.canvasHeight/2)).toInt();
+		var playerPosition = this.actors[playerIndex].position.toInt()
 		var worldPosition = canvasPosition.vecAdd(playerPosition.vecSub(halfCanvas));
 		return worldPosition;
 	}
-	/** Handle the mouse movement on the stage in canvas coordinates **/
-	mouseMove(x,y){
-		var canvasPosition=new Pair(x,y);
-		var worldPosition=this.mapCanvasToWorld(canvasPosition);
-		this.player.pointTurret(worldPosition);
-		
-	}
+
 	/** Handle the mouse click on the stage in canvas coordinates **/
 	mouseClick(x,y){
 		var canvasPosition=new Pair(x,y);
@@ -109,7 +109,15 @@ class Stage {
 	addActor(actor){
 		this.actors.push(actor);
 	}
+	
+	setDirectionPlayer(x, y,index) {
+		//index represents the index in the actors list
+		this.actors[index].setDirection(x,y)
+	}
 
+	/*
+	Now we have to figure out how each player movement should be configured
+	*/
 	addNewPlayer(id){
 		//each new Player is added to the front of the list
 		//Tank player object will have a id , and the playersID object in the stage
@@ -121,12 +129,13 @@ class Stage {
 		var b = new Tank(this, fixPosition, s.velocity, s.colour, s.radius);
 		b.assignId(id)
 		// this.addPlayer(b)
-		this.player = b
+		// this.player = b
 		// this.addActor(this.player)
 		// this.actors.splice()
 		this.actors.splice(0,0,b)
 		// console.log(this.actors[0]);
-		this.playersID.push(id)
+		this.playersID.splice(0,0,id)
+		// this.playersID.push(id)
 		// this.playersID[id] = b
 		
 	}
@@ -150,10 +159,10 @@ class Stage {
 	step(){
 		for(var i=0;i<this.actors.length;i++){
 			this.actors[i].step();
-			if (this.actors[i].actorType == 'Tank'){
-				const id = this.actors[i].id
-				this.playersID[id] = this.actors[i]
-			}
+			// if (this.actors[i].actorType == 'Tank'){
+			// 	const id = this.actors[i].id
+			// 	this.playersID[id] = this.actors[i]
+			// }
 			//assign actor to the playerID
 
 			// console.log(this.actors[i].constructor.name);
