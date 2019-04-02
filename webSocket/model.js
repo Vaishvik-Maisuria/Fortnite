@@ -73,7 +73,7 @@ class Stage {
 			velocity : new Pair(rand(20), rand(20)),
 		}
 	}
-	
+
 	/** Handle the mouse movement on the stage in canvas coordinates **/
 	mouseMovePlayer(x,y, playerIndex){
 		var canvasPosition=new Pair(x,y);
@@ -87,6 +87,10 @@ class Stage {
 		var playerPosition = this.actors[playerIndex].position.toInt()
 		var worldPosition = canvasPosition.vecAdd(playerPosition.vecSub(halfCanvas));
 		return worldPosition;
+	}
+
+	setPickUpPlayer(playerIndex) {
+		this.actors[playerIndex].setPickup(true)
 	}
 
 	/** Handle the mouse click on the stage in canvas coordinates **/
@@ -354,6 +358,7 @@ class Tank extends Actor {
 		this.ammunition = 0;
 		this.id = 0
 		this.turtPosition = this.getTurretPosition()
+		
 	}
 
 	assignId(id){
@@ -391,8 +396,8 @@ class Tank extends Actor {
 				this.health = 10;
 			}
 		}
-		this.setPickup(false);
-
+		this.setPickup(false);		
+		
 		super.step();
 		this.velocity=this.velocity.sProd(.95);
 		this.turtPosition = this.getTurretPosition().toInt()
@@ -441,7 +446,11 @@ class Tank extends Actor {
 	}
 
 	setFire(val){ this.fire = val; }
-	setPickup(val){ this.pickup = val; }
+	setPickup(val){ 
+		// console.log('Pick up enabled');
+		
+		this.pickup = val; 
+	}
 }
 
 class Opponent extends Tank {
@@ -502,5 +511,5 @@ class Bullet extends Actor {
 	}
 }
 
-export {Stage, Pair, Actor, Ball, Box, Tank, Opponent, Bullet}
+module.exports = {Stage, Pair, Actor, Ball, Box, Tank, Opponent, Bullet}
 

@@ -121,7 +121,8 @@ wss.on('connection', function(ws) {
 	
 	// wss.sendMapCoordinates()
 	
-
+	console.log("new Connection");
+	
 	ws.on('message', function(message) {
 		const data = JSON.parse(message)
 		handleClientAction(data)
@@ -139,33 +140,40 @@ Possible Actions
 */
 
 function handleClientAction(data){
-	console.log(data);
+	// console.log(data);
 	
 	switch (data.type) {
 		case 'userName':
 			//Data has the usernamem
-			console.log("id Received :", data.id);
+			// console.log("id Received :", data.id);
 			mainStage.addNewPlayer(data.id)
+			
 			// console.log("Players Id",mainStage.playersID);
 			break
 		case 'pickup':
 			console.log("-------------------------------picking up");
-			mainStage.player.setPickup(true);
+			// mainStage.player.setPickup(true);
+			console.log('ammo Before', mainStage.actors[data.playerIndex].amunition);
+
 			mainStage.setPickUpPlayer(data.playerIndex)
+			
+			console.log('ammo Added', mainStage.actors[data.playerIndex].amunition);
+			
+
 			break;
 		case 'movement':
-			console.log('---------------------------- Key Movement');
+			// console.log('---------------------------- Key Movement');
 			//now we need to set the direction with a mainStage method
 			// mainStage.player.setDirection(data.x, data.y);
 			mainStage.setDirectionPlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseMovement':
-			console.log('*--------------------------- Mouse Cursor Movement');
+			// console.log('*--------------------------- Mouse Cursor Movement');
 			// mainStage.mouseMove(data.x, data.y);
 			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseClick':
-			console.log('---------------------------- Mouse Click');
+			// console.log('---------------------------- Mouse Click');
 			mainStage.mouseClick(data.x, data.y)
 			break
 		default:
