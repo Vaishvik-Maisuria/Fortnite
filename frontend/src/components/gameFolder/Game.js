@@ -35,7 +35,7 @@ class Game extends Component {
 
   componentWillMount() {
     this.setState({
-      socket: new WebSocket("ws://142.1.3.62:8001")
+      socket: new WebSocket("ws://localhost:8001")
     })
   }
 
@@ -141,32 +141,38 @@ class Game extends Component {
 
       var context = canvas.getContext('2d')
       if (ids.includes(id)) {
-        // console.log('in drawing');
-        // console.log('Players Index', ids.indexOf(id));
 
         const playerIndex = ids.indexOf(id)
-        if (this.state.player == null || this.state.playerIndex != playerIndex) {
-          //assign the new player
-          this.setState({
-            player: config[playerIndex],
-            playerIndex: playerIndex
-          })
-          // console.log('#-----------------', config[playerIndex]);
+        if (config[playerIndex].dead){
+          //Player is dead
+          this.state.socket.close()
+          console.log('Player is dead');
+          
+        }else {
+        
+          if (this.state.player == null || this.state.playerIndex != playerIndex) {
+            //assign the new player
+            this.setState({
+              player: config[playerIndex],
+              playerIndex: playerIndex
+            })
+            // console.log('#-----------------', config[playerIndex]);
+            
+            draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
+          } else {
+            //change the position
+            //we only want the turretDirection
+            var temp = config[playerIndex]
+            temp.turretDirection = this.state.player.turretDirection
+            // var temp = this.state.player
+            // temp.position = config[playerIndex].position
 
-          draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
-        } else {
-          //change the position
-          //we only want the turretDirection
-          var temp = config[playerIndex]
-          temp.turretDirection = this.state.player.turretDirection
-          // var temp = this.state.player
-          // temp.position = config[playerIndex].position
-
-          this.setState({
-            player: temp
-          })
-          //player has been assigned
-          draw(context, config, playerIndex, temp) //after the state has changed
+            this.setState({
+              player: temp
+            })
+            //player has been assigned
+            draw(context, config, playerIndex, temp) //after the state has changed
+          }
         }
 
       }
