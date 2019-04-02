@@ -15,6 +15,7 @@ class Stage {
 		this.actors=[]; // all actors on this stage (monsters, player, boxes, ...)
 		this.player= null; // a special actor, the player
 		this.playersID = []
+		this.bullets = []
 		// the logical width and height of the stage
 		/**
 		this.width=canvas.width;
@@ -117,6 +118,15 @@ class Stage {
 	removePlayer(){
 		this.removeActor(this.player);
 		this.player=null;
+	}
+
+	addBullets(bullet){
+		console.log("added bullet");
+		let acttorLength = this.playersID.length + 5; 
+		this.actors.splice(acttorLength, 0, bullet)
+		// console.log(this.actors);
+		// this.bullets.push(bullet)
+		// this.actors.unshift(actor);
 	}
 
 	addActor(actor){
@@ -390,12 +400,13 @@ class Tank extends Actor {
 	
 		if(this.fire && this.amunition>0){
 			this.amunition--;
-
+			console.log("In the tanks ")
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
 			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
+			this.stage.addBullets(bullet);
 			// console.log("step function is getting called and bullet is getting added to the stage");
-			this.stage.addActor(bullet);
+			// this.stage.addActor(bullet);
 		}
 		this.setFire(false);
 
@@ -499,7 +510,7 @@ class Bullet extends Actor {
 	constructor(stage, position, velocity, colour, radius){
 		super(stage, position, velocity, colour, radius);
 		this.lifetime = 200;
-		this.type = 'Bullet'
+		this.actorType = 'Bullet'
 	}
 
 	collide(other, newState){
