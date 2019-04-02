@@ -188,15 +188,8 @@ export function drawPlayer(context, player, clientPlayer) {
 	context.arc(intPosition.x, intPosition.y, player.radius, 0, 2 * Math.PI, false); 
     context.fill();
     
-    // var turretPos = player.turtPosition
-    // turretPos =  toInt(turretPos.x, turretPos.y);
-    // drawTurret(context, player, turretPos)
-
-
-
 	if (clientPlayer.id == player.id){
-        console.log('this is a client');
-        
+
 		// we will use client player for mouseMovement
 		var turretPos = getTurretPosition(clientPlayer)
 		drawTurret(context, clientPlayer, turretPos)

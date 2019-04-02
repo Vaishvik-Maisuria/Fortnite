@@ -52,20 +52,13 @@ class Game extends Component {
       this.sendData(this.state.mouseMovementData)
     }, 400)
 
-    // setInterval(function() {
-    //   this.sendData(this.state.mouseMovementData)
-    //   // const data = JSON.stringify(this.state.mouseMovementData)
-    //   // this.state.socket.send(data);
-    
-    // }, 400)
-   
   }
 
-  
+
   handleMouseMovement = (event) => {
     const canvas = this.refs.canvas;
     var mousePos = getMousePos(canvas, event);
-    // console.log(mousePos.x + ',' + mousePos.y);
+
     const mouseMovementData = {
       playerIndex: this.state.playerIndex,
       id: this.state.id,
@@ -79,8 +72,6 @@ class Game extends Component {
       player: mouseMove(mousePos.x, mousePos.y, this.state.player)
     })
     console.log("Mouse moving");
-    
-    // mouseMove(mousePos.x, mousePos.y, th)
 
   }
 
@@ -112,9 +103,6 @@ class Game extends Component {
 
   initializeSocketOperations = (canvas) => {
     this.state.socket.onopen = function (event) {
-      // console.log('Defining onOpen');
-      // console.log("Sending in id", this.state.id);
-      const id = this.state.id
       
       const data = {
         type: 'userName',
@@ -130,11 +118,8 @@ class Game extends Component {
       var item = JSON.parse(event.data)
     
       const config = item.data
-      const ids = config[0].stage.playersID
-      // console.log(ids);
-      
+      const ids = config[0].stage.playersID      
       const id = this.state.id
-      // console.log("---------------#", id);
       
       var context = canvas.getContext('2d')
       if (ids.includes(id)){
@@ -160,8 +145,6 @@ class Game extends Component {
           draw(context, config, playerIndex, temp) //after the state has changed
         }
         
-        //Player is in there
-        // draw(context,config, playerIndex )
       }
     }.bind(this)
 
