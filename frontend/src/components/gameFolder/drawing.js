@@ -12,15 +12,18 @@ class Pair {
 	vecSub(other){ return new Pair(this.x-other.x, this.y-other.y); }
 }
 
-
 export function ID() {
 	return '_' + Math.random().toString(36).substr(2, 9);
 }
 
-export function draw(context, config, playerIndex) {
+export function toInt(x,y){ return new Pair(Math.round(x), Math.round(y)); }
+
+
+export function draw(context, config, playerIndex, clientPlayer) {
 	// var context = canvas2.getContext('2d')
 	
-    var player = config[playerIndex]
+    // var player = config[playerIndex]
+    var player = clientPlayer
 
 	// if (clientPlayer == null){
 	// 	clientPlayer = config[playerIndex]
@@ -28,7 +31,7 @@ export function draw(context, config, playerIndex) {
 	// 	clientPlayer.position = player.position
     // }
     
-	console.log('player id ', player.id);
+	// console.log('player id ', player.id);
 	
 	let playerPosition = toInt(player.position.x, player.position.y);
 	let x=playerPosition.x;
@@ -57,7 +60,7 @@ export function draw(context, config, playerIndex) {
 		// console.log(type);
 		switch (type) {
 			case 'Tank':
-				// drawPlayer(context, config[i])
+				drawPlayer(context, config[i], clientPlayer)
 				// console.log(i);
 				break;
 			case 'Ball':
@@ -87,8 +90,10 @@ export function pointTurret(crosshairs, player){
     var delta = crosshairs.toInt().vecSub(player.position.toInt());
     if(delta.x!=0 || delta.y !=0){
         player.turretDirection = delta.normalize();
-	}
-	clientPlayer = player
+    }
+    
+    return player
+	// clientPlayer = player
     // console.log(this.turretDirection);
     
 }
@@ -108,10 +113,11 @@ export function mapCanvasToWorld(canvasPosition, player){
 export function mouseMove(x,y, player){
     var canvasPosition=new Pair(x,y);
     var worldPosition= mapCanvasToWorld(canvasPosition, player);
-    pointTurret(worldPosition, player);
+    var updatedPlayer = pointTurret(worldPosition, player);
+    return updatedPlayer
 }
 
-export function getTurretPosition(){
+export function getTurretPosition(clientPlayer){
 	// position = ((x,y)+turretDirection*this.radius).toInt()
 	clientPlayer.position = makePair(clientPlayer.position)
 	clientPlayer.turretDirection = makePair(clientPlayer.turretDirection)
@@ -149,7 +155,7 @@ and it simply draws it out
 // }
 
 
-export function toInt(x,y){ return new Pair(Math.round(x), Math.round(y)); }
+// export function toInt(x,y){ return new Pair(Math.round(x), Math.round(y)); }
 
 export function drawBall(context, ball) {
 
@@ -174,17 +180,25 @@ export function drawBox(context, box) {
 	context.strokeRect(x,y,width,width);
 }
 
-export function drawPlayer(context, player) {
+export function drawPlayer(context, player, clientPlayer) {
 	
 	context.fillStyle = player.colour;
 	context.beginPath(); 
 	var intPosition = toInt(player.position.x, player.position.y);
 	context.arc(intPosition.x, intPosition.y, player.radius, 0, 2 * Math.PI, false); 
-	context.fill();
+    context.fill();
+    
+    // var turretPos = player.turtPosition
+    // turretPos =  toInt(turretPos.x, turretPos.y);
+    // drawTurret(context, player, turretPos)
 
-	if (id == player.id){
-		//we will use client player for mouseMovement
-		var turretPos = getTurretPosition()
+
+
+	if (clientPlayer.id == player.id){
+        console.log('this is a client');
+        
+		// we will use client player for mouseMovement
+		var turretPos = getTurretPosition(clientPlayer)
 		drawTurret(context, clientPlayer, turretPos)
 	}else{
 		//other Players
@@ -197,7 +211,7 @@ export function drawPlayer(context, player) {
 
 export function drawTurret(context, player, turretPos){
 
-	console.log(turretPos);
+	// console.log(turretPos);
 	context.beginPath();
 	context.arc(turretPos.x, turretPos.y, player.radius/2, 0, 2 * Math.PI, false); 
 	context.fill();
