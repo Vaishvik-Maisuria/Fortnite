@@ -55,18 +55,16 @@ export function draw(context, config, playerIndex, clientPlayer) {
 	context.translate(xt,yt);
 	context.fillRect(0, 0, 10000, 10000);
 	
-	console.log(config);
 
 	for (var i = 0; i < config.length; i ++){
 		const type = config[i].actorType
+	
 		
-
-		if ( type == "Bullet"){
-			console.log("Bullet Got shooot")
-		}
-
-
 		switch (type) {
+			case 'Bullet':
+				console.log("Got here Bullets case")
+				drawBullet(context, config[i])
+				break
 			case 'Tank':
 				drawPlayer(context, config[i], clientPlayer)
 				
@@ -78,10 +76,7 @@ export function draw(context, config, playerIndex, clientPlayer) {
 			case 'Box':
 				drawBox(context, config[i])
 				break
-			case 'Bullet':
-				console.log("Got here Bullets case")
-				drawBullet(context, config[i])
-				break
+			
 			default:
 				break;
 		}
