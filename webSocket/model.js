@@ -100,6 +100,15 @@ class Stage {
 		this.player.setFire(true);
 	}
 
+	/** Handle the mouse click on the stage in canvas coordinates **/
+	mouseClickPLayer(x,y, playerIndex){
+		// var canvasPosition=new Pair(x,y);
+		// var worldPosition=this.mapCanvasToWorld(canvasPosition);
+		
+		this.actors[playerIndex].setFire(true)
+		// this.player.setFire(true);
+	}
+
 	addPlayer(player){
 		this.addActor(player);
 		this.player=player;
@@ -378,12 +387,14 @@ class Tank extends Actor {
 		return this.position.vecAdd(this.turretDirection.sProd(this.radius));
 	}
 	step(){
+	
 		if(this.fire && this.amunition>0){
 			this.amunition--;
 
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
 			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
+			// console.log("step function is getting called and bullet is getting added to the stage");
 			this.stage.addActor(bullet);
 		}
 		this.setFire(false);
