@@ -79,7 +79,7 @@ class Game extends Component {
     var key = event.key;
       console.log(this.state.id);
       
-      if(key in moveMap2){
+      if(key in moveMap2) {
         const keyPressData ={
           x: moveMap2[key][0],
           y: moveMap2[key][1],
@@ -88,10 +88,11 @@ class Game extends Component {
           type:'none'
         }
 
-        if (key == 'e')
-          keyPressData.type = 'pickUp'
-        else
+        if (key == 'e'){
+          keyPressData.type = 'pickup'
+        }else{
           keyPressData.type = 'movement'
+        }
         // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
         console.log("Key is pressed");
         this.sendData(keyPressData)
@@ -118,7 +119,7 @@ class Game extends Component {
       var item = JSON.parse(event.data)
     
       const config = item.data
-      const ids = config[0].stage.playersID      
+      const ids = config[0].stage.playersID
       const id = this.state.id
       
       var context = canvas.getContext('2d')
@@ -133,11 +134,17 @@ class Game extends Component {
             player: config[playerIndex],
             playerIndex: playerIndex
           })
+          console.log('#-----------------',config[playerIndex]);
+          
           draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
         }else{
           //change the position
-          var temp = this.state.player
-          temp.position = config[playerIndex].position
+          //we only want the turretDirection
+          var temp = config[playerIndex]
+          temp.turretDirection =  this.state.player.turretDirection
+          // var temp = this.state.player
+          // temp.position = config[playerIndex].position
+          
           this.setState({
             player: temp
           })

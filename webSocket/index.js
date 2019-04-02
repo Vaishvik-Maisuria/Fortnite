@@ -146,13 +146,12 @@ function handleClientAction(data){
 			//Data has the usernamem
 			console.log("id Received :", data.id);
 			mainStage.addNewPlayer(data.id)
-		
 			// console.log("Players Id",mainStage.playersID);
-
 			break
 		case 'pickup':
 			console.log("-------------------------------picking up");
 			mainStage.player.setPickup(true);
+			mainStage.setPickUpPlayer(data.playerIndex)
 			break;
 		case 'movement':
 			console.log('---------------------------- Key Movement');
