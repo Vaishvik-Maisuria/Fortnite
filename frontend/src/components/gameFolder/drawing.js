@@ -62,7 +62,7 @@ export function draw(context, config, playerIndex, clientPlayer) {
 		
 		switch (type) {
 			case 'Bullet':
-				console.log("Got here Bullets case")
+			
 				drawBullet(context, config[i])
 				break
 			case 'Tank':
@@ -216,8 +216,8 @@ export function drawTurret(context, player, turretPos){
 }
 
 export function drawBullet(context, bullet) {
-	console.log("Drawing bullet");
-	console.log(bullet.position);
+	// console.log("Drawing bullet");
+	// console.log(bullet.position);
 	
 	
 	context.fillStyle = bullet.colour;

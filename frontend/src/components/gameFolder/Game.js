@@ -35,7 +35,7 @@ class Game extends Component {
 
   componentWillMount() {
     this.setState({
-      socket: new WebSocket("ws://localhost:8001")
+      socket: new WebSocket("ws://142.1.3.62:8001")
     })
   }
 
@@ -64,7 +64,7 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-    console.log('mouse clicked');
+    // console.log('mouse clicked');
     
     this.sendData(mouseMovementData)
 
@@ -111,7 +111,7 @@ class Game extends Component {
         keyPressData.type = 'movement'
       }
       // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
-      console.log("Key is pressed");
+      // console.log("Key is pressed");
       this.sendData(keyPressData)
     }
 
