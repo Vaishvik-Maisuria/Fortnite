@@ -3,7 +3,7 @@
 function randint(n){ return Math.round(Math.random()*n); }
 function rand(n){ return Math.random()*n; }
 
-const safeJsonStringify = require('safe-json-stringify');
+// const safeJsonStringify = require('safe-json-stringify');
 var model = require('./model')
 var clientCounter = 0
 /*
@@ -173,8 +173,9 @@ function handleClientAction(data){
 			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseClick':
-			// console.log('---------------------------- Mouse Click');
-			mainStage.mouseClick(data.x, data.y)
+			console.log('---------------------------- Mouse Click');
+			// mainStage.mouseClick(data.x, data.y)
+			mainStage.mouseClickPLayer(data.x, data.y, data.playerIndex)
 			break
 		default:
 			break;
