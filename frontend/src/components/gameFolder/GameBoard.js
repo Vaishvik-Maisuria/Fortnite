@@ -39,7 +39,7 @@ class GameBoard extends Component {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Game goToStats={this.goToStats} />
+          <Game user={this.props.user}  goToStats={this.goToStats} />
         </div>
       );
     }
@@ -55,7 +55,7 @@ class GameBoard extends Component {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Stats />
+          <Stats user={this.props.user} />
         </div>
       );
     }

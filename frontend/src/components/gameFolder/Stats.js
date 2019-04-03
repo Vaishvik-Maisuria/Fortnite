@@ -28,9 +28,20 @@ class Stats extends Component {
       method: "GET",
       url: "/api/users/",
     }).done(function (data, text_status, jqXHR) {
+      
+      var userProfile = null
+      for (var i = 0; i < data.data.length; i ++){
+        if (data.data[i].username == this.props.user){
+          userProfile = data.data[i]
+          break
+        }
+      }
+
       this.setState({
-        players: data.data
+        players: data.data,
+        player: userProfile
       })
+
  
       console.log('log data ',data.data);
       /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
@@ -44,14 +55,20 @@ class Stats extends Component {
     });
   }
 
-  render() {    
+  render() {
+    
     return (
       <div className="row container">
         <div className="card" style={{margin: '2%', paddingBottom:'2%'}} >
-            <h1>User Name</h1>
+            <h1>{this.props.user}</h1>
 
             <div className=" deep-purple darken-3 card-panel" style={{margin: '5%', height:'25%'}}>
-              <h2 className="white-text text-darken-3">1/2</h2>
+              {this.state.player!=null? 
+                <h2 className="white-text text-darken-3">{this.state.player.wins + '/' + this.state.player.loses}</h2>
+                :
+                null
+              }
+             
               <text className="white-text">WIN/LOSE Ratio</text>
             </div>
 
