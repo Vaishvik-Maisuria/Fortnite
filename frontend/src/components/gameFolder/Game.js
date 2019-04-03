@@ -23,6 +23,8 @@ class Game extends Component {
       id: ID(),
       player: null,
       playerIndex: 0,
+      mouseInterval: null,
+      playerDead: false,
       mouseMovementData: {
         playerIndex: null,
         id: 0,
@@ -40,6 +42,9 @@ class Game extends Component {
   }
 
   componentDidMount() {
+    if(this.state.playerDead){
+      this.props.goToStats()
+    }
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext("2d");
 
@@ -48,9 +53,13 @@ class Game extends Component {
     // document.addEventListener('mouseMove', this.handleMouseMovement)
     canvas.addEventListener("click", this.handleMouseClick);
     canvas.addEventListener("mousemove", this.handleMouseMovement);
-    setInterval(() => {
+    var intVal = setInterval(() => {
       this.sendData(this.state.mouseMovementData)
     }, 400)
+
+    this.setState({
+      mouseInterval: intVal
+    })
 
   }
 
@@ -152,10 +161,12 @@ class Game extends Component {
           this.sendData(data)
           this.state.socket.close()
           console.log('Player is dead');
-
+          clearInterval(this.state.mouseInterval)
+          this.setState({
+            playerDead: true
+          })
           // this.props.goToStats()
-          
-          
+
         }else {
         
           if (this.state.player == null || this.state.playerIndex != playerIndex) {
@@ -205,10 +216,19 @@ class Game extends Component {
       <div className={styles.center}>
         <div class={styles.ui_top} id="ui_play">
           <center>
-            <canvas ref="canvas"
+            {this.state.playerDead==false?
+              <canvas ref="canvas"
+                width={700} height={700}
+                style={{ border: '1px solid black' }}
+              />
+              :
+              
+              <text>Game Ended{this.props.goToStats()}</text>
+            }
+            {/* <canvas ref="canvas"
               width={700} height={700}
               style={{ border: '1px solid black' }}
-            />
+            /> */}
             {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
           </center>
         </div>
