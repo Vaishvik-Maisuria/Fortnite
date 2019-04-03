@@ -161,7 +161,12 @@ class Stage {
 		if(index!=-1){
 			this.actors.splice(index,1);
 		}
-    }
+	}
+	
+	removePlayer(playerIndex){
+		this.actors.splice(playerIndex, 1)
+		this.playersID.splice(playerIndex, 1)
+	}
     
 	animate(){
 		this.step();

@@ -95,7 +95,6 @@ const getCircularReplacer = () => {
 
 
 wss.sendMapCoordinates = function() {
-
 	
 	for (let ws of this.clients){
 		
@@ -106,7 +105,9 @@ wss.sendMapCoordinates = function() {
 		// console.log(finalc.id);
 		const check = JSON.stringify(finalc, getCircularReplacer())
 
-		ws.send(check);
+		if(ws.readyState === ws.OPEN){
+			ws.send(check);
+		}
 	}
 	// const c = {...mainStage.actors, 'id': clientCounter}
 }
@@ -125,7 +126,7 @@ wss.on('connection', function(ws) {
 	
 	ws.on('message', function(message) {
 		const data = JSON.parse(message)
-		handleClientAction(data)
+		handleClientAction(data, ws)
 	});
 });
 
@@ -139,10 +140,16 @@ Possible Actions
 
 */
 
-function handleClientAction(data){
+function handleClientAction(data, ws){
 	// console.log(data);
 	
 	switch (data.type) {
+		case 'deadPlayer':
+			mainStage.removePlayer(data.playerIndex)
+			console.log('Player removed. totalPlayers', mainStage.actors.length);
+		
+			
+			break
 		case 'userName':
 			//Data has the usernamem
 			// console.log("id Received :", data.id);

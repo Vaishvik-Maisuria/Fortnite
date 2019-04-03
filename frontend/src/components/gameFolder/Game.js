@@ -35,7 +35,7 @@ class Game extends Component {
 
   componentWillMount() {
     this.setState({
-      socket: new WebSocket("ws://localhost:8001")
+      socket: new WebSocket("ws://142.1.3.167:8001")
     })
   }
 
@@ -145,8 +145,14 @@ class Game extends Component {
         const playerIndex = ids.indexOf(id)
         if (config[playerIndex].dead){
           //Player is dead
+          const data = {
+            type: 'deadPlayer',
+            playerIndex: playerIndex
+          }
+          this.sendData(data)
           this.state.socket.close()
           console.log('Player is dead');
+          
           
         }else {
         

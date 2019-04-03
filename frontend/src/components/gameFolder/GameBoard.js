@@ -15,6 +15,7 @@ class GameBoard extends Component {
       view: "Game"
     };
     this.changeView = this.changeView.bind(this);
+    this.goToStats = this.changeView.bind(this);
   }
 
   changeView = (viewSelect) => {
@@ -26,13 +27,19 @@ class GameBoard extends Component {
       view: viewSelect,
     });
   }
+  
+  goToStats = () => {
+    this.setState({
+      view: "Stats",
+    });
+  }
 
   render() {
     if (this.state.view === 'Game') {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Game />
+          <Game goToStats = {this.goToStats.bind(this)} />
         </div>
       );
     }
