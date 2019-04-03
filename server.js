@@ -154,10 +154,10 @@ function validateUser(data){
 // Create a new user
 app.post('/api/user/:user', function (req, res) {
 // app.post('/api/user', function (req, res) {
-	
+	console.log('adding in new user');
 	console.log(req.user,req.password,req.confirmpassword,req.skill,req.year,req.month,req.day + "\n\n");
 	var result = { error: validateUser(req.body) , success:false};
-	if(isEmptyObject(result["error"])){
+	if(!isEmptyObject(result["error"])){
 		let sql = 'INSERT INTO user '+
 			'(user, password, skill, year, month, day, playmorning, playafternoon, playevening) ' +
 			' VALUES(?,?,?,?,?,?,?,?,?);';
@@ -173,8 +173,20 @@ app.post('/api/user/:user', function (req, res) {
     					result["error"]["db"] = "Not updated";
 					res.status(404);
 				} else {
-					res.status(200);
-					result.success = true;
+
+					let sql = 'insert into score (username) values(?);'
+					db.run(sql,[d.user], function(err){
+						if (err){
+							res.status(500); 
+							result["error"]["db"] = err.message;
+						}else{
+							res.status(200);
+							result.success = true;
+						}
+							
+					})
+					// res.status(200);
+					// result.success = true;
 				}
 			}
 			res.json(result);
@@ -287,6 +299,34 @@ app.get('/api/user/:user', function (req, res) {
 	}
 });
 
+
+app.get('/api/users/', function (req, res) {
+	// console.log(JSON.stringify(req));
+	// var user = req.body.user;
+	// var password = req.body.password;
+	var result = { error: {} , success:false};
+	let sql = 'SELECT * FROM score;';
+	db.all(sql, function (err, row){
+		// console.log("row, err", row, err);
+		
+		if (err) {
+			res.status(500); 
+				result["error"]["db"] = err.message;
+		} else if (row) {
+			res.status(200);
+			result.data = row;
+			result.success = true;
+			// console.log('info received', row);
+			
+		} else {
+			res.status(401);
+			result.success = false;
+				result["error"]["login"] = "login failed";
+		}
+		res.json(result);
+	});
+	
+});
 
 
 app.listen(3001, () =>
