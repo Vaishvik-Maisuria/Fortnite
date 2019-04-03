@@ -64,7 +64,7 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-    console.log('mouse clicked');
+    // console.log('mouse clicked');
     
     this.sendData(mouseMovementData)
 
@@ -111,7 +111,7 @@ class Game extends Component {
         keyPressData.type = 'movement'
       }
       // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
-      console.log("Key is pressed");
+      // console.log("Key is pressed");
       this.sendData(keyPressData)
     }
 
@@ -141,32 +141,46 @@ class Game extends Component {
 
       var context = canvas.getContext('2d')
       if (ids.includes(id)) {
-        // console.log('in drawing');
-        // console.log('Players Index', ids.indexOf(id));
 
         const playerIndex = ids.indexOf(id)
-        if (this.state.player == null || this.state.playerIndex != playerIndex) {
-          //assign the new player
-          this.setState({
-            player: config[playerIndex],
+        if (config[playerIndex].dead){
+          //Player is dead
+          const data = {
+            type: 'deadPlayer',
             playerIndex: playerIndex
-          })
-          // console.log('#-----------------', config[playerIndex]);
+          }
+          this.sendData(data)
+          this.state.socket.close()
+          console.log('Player is dead');
 
-          draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
-        } else {
-          //change the position
-          //we only want the turretDirection
-          var temp = config[playerIndex]
-          temp.turretDirection = this.state.player.turretDirection
-          // var temp = this.state.player
-          // temp.position = config[playerIndex].position
+          // this.props.goToStats()
+          
+          
+        }else {
+        
+          if (this.state.player == null || this.state.playerIndex != playerIndex) {
+            //assign the new player
+            this.setState({
+              player: config[playerIndex],
+              playerIndex: playerIndex
+            })
+            // console.log('#-----------------', config[playerIndex]);
+            
+            draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
+          } else {
+            //change the position
+            //we only want the turretDirection
+            var temp = config[playerIndex]
+            temp.turretDirection = this.state.player.turretDirection
+            // var temp = this.state.player
+            // temp.position = config[playerIndex].position
 
-          this.setState({
-            player: temp
-          })
-          //player has been assigned
-          draw(context, config, playerIndex, temp) //after the state has changed
+            this.setState({
+              player: temp
+            })
+            //player has been assigned
+            draw(context, config, playerIndex, temp) //after the state has changed
+          }
         }
 
       }

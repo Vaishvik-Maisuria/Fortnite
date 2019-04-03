@@ -45,7 +45,7 @@ class Stage {
 		// Some balls
 		
 		const check = new Pair(10, 10)
-		console.log("Sample type check", typeof(check));
+		// console.log("Sample type check", typeof(check));
 			
 
 		for(let i=0;i<numBalls;i++){
@@ -151,15 +151,8 @@ class Stage {
 		//@Todo
 		var b = new Tank(this, fixPosition, s.velocity, s.colour, s.radius);
 		b.assignId(id)
-		// this.addPlayer(b)
-		// this.player = b
-		// this.addActor(this.player)
-		// this.actors.splice()
 		this.actors.splice(0,0,b)
-		// console.log(this.actors[0]);
 		this.playersID.splice(0,0,id)
-		// this.playersID.push(id)
-		// this.playersID[id] = b
 		
 	}
 
@@ -168,7 +161,12 @@ class Stage {
 		if(index!=-1){
 			this.actors.splice(index,1);
 		}
-    }
+	}
+	
+	removePlayer(playerIndex){
+		this.actors.splice(playerIndex, 1)
+		this.playersID.splice(playerIndex, 1)
+	}
     
 	animate(){
 		this.step();
@@ -182,14 +180,17 @@ class Stage {
 	step(){
 		for(var i=0;i<this.actors.length;i++){
 			this.actors[i].step();
-			// if (this.actors[i].actorType == 'Tank'){
-			// 	const id = this.actors[i].id
-			// 	this.playersID[id] = this.actors[i]
-			// }
-			//assign actor to the playerID
-
-			// console.log(this.actors[i].constructor.name);
+			this.checkDeadState(i)
 		}
+	}
+
+	checkDeadState(index){
+		if (this.actors[index].actorType == 'Tank'){
+			if (this.actors[index].health <= 0){
+				this.actors[index].setDead(true)
+			}
+		}
+		
 	}
 
 	draw(){
@@ -272,9 +273,12 @@ class Actor {
 			this.savedState[this.stateVars[s]]= this[this.stateVars[s]];
 		}
 	}
+	
+
 	makeZombie(){ this.isZombie = true; }
 
 	collide(other){ 
+		
 		// Stop us moving when we collide with someone else
 		this.position = this.savedState.position;
 		this.velocity = new Pair(0,0);
@@ -320,6 +324,7 @@ class Actor {
 			this.velocity.y=-Math.abs(this.velocity.y);
 		}
 	}
+
 	draw(context){
 		context.fillStyle = this.colour;
    		// context.fillRect(this.x, this.y, this.radius,this.radius);
@@ -377,12 +382,16 @@ class Tank extends Actor {
 		this.ammunition = 0;
 		this.id = 0
 		this.turtPosition = this.getTurretPosition()
-		
+		this.dead = false
 	}
 
 	assignId(id){
 		this.id = id
 		// this.stage.playersID.push(this.id)
+	}
+	
+	setDead(val){
+		this.dead = val
 	}
 
 	// Point the turret at crosshairs in world coordinates
@@ -396,11 +405,22 @@ class Tank extends Actor {
 		// position = ((x,y)+turretDirection*this.radius).toInt()
 		return this.position.vecAdd(this.turretDirection.sProd(this.radius));
 	}
+
+	collide(other){ 
+		
+		
+		
+		// Stop us moving when we collide with someone else
+		this.position = this.savedState.position;
+		this.velocity = new Pair(0,0);
+	}
+
 	step(){
+		// console.log("The health of the actor = " + this.health);
 	
 		if(this.fire && this.amunition>0){
 			this.amunition--;
-			console.log("In the tanks ")
+			// console.log("In the tanks ")
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
 			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
@@ -409,7 +429,7 @@ class Tank extends Actor {
 			// this.stage.addActor(bullet);
 		}
 		this.setFire(false);
-
+		// console.log("this.pickup: " + this.pickup);
 		if(this.pickup){
 			var closeActors = this.getCloseActors(5); // we may not be touching, but pick them up just the same
 			var closeActor = closeActors.find(actor => actor.constructor.name=="Box");
@@ -431,42 +451,8 @@ class Tank extends Actor {
 		if(m>5)newVelocity=newVelocity.normalize().sProd(5);
 		this.velocity = newVelocity;
 	}
-	draw(context){
-		// console.log(this.getTankConfiguration());
-		
-		context.fillStyle = this.colour;
-		context.beginPath(); 
-		var intPosition = this.position.toInt();
-		context.arc(intPosition.x, intPosition.y, this.radius, 0, 2 * Math.PI, false); 
-		context.fill();   
 
-		var turretPos = this.getTurretPosition().toInt();
-		console.log(turretPos,'turret position');
-		context.beginPath(); 
-		context.arc(turretPos.x, turretPos.y, this.radius/2, 0, 2 * Math.PI, false); 
-		context.fill();   
-	}
-
-	getTankConfiguration() {
-		
-		const config = {
-			position: this.position,
-			velocity: this.velocity,
-			colour: this.colour,
-			radius: this.radius,
-			isZombie: this.isZombie,
-			healthL: this.healthL,
-			stateVars: this.stateVars,
-			turretDirection: this.turretDirection,
-			fire: this.fire, // whether we have to fire a bullet in the next step
-			pickup: this.pickup,
-			ammunition: this.ammunition
-
-		}
-
-		return config
-	}
-
+	
 	setFire(val){ this.fire = val; }
 	setPickup(val){ 
 		// console.log('Pick up enabled');
@@ -516,6 +502,7 @@ class Bullet extends Actor {
 	collide(other, newState){
 		this.makeZombie();
 		other.health--;
+
 		if(other.health<=0)other.makeZombie();
 	}
 
