@@ -45,7 +45,7 @@ class Stage {
 		// Some balls
 		
 		const check = new Pair(10, 10)
-		console.log("Sample type check", typeof(check));
+		// console.log("Sample type check", typeof(check));
 			
 
 		for(let i=0;i<numBalls;i++){
@@ -416,11 +416,11 @@ class Tank extends Actor {
 	}
 
 	step(){
-		console.log("The health of the actor = " + this.health);
+		// console.log("The health of the actor = " + this.health);
 	
 		if(this.fire && this.amunition>0){
 			this.amunition--;
-			console.log("In the tanks ")
+			// console.log("In the tanks ")
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
 			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
@@ -429,7 +429,7 @@ class Tank extends Actor {
 			// this.stage.addActor(bullet);
 		}
 		this.setFire(false);
-		console.log("this.pickup: " + this.pickup);
+		// console.log("this.pickup: " + this.pickup);
 		if(this.pickup){
 			var closeActors = this.getCloseActors(5); // we may not be touching, but pick them up just the same
 			var closeActor = closeActors.find(actor => actor.constructor.name=="Box");

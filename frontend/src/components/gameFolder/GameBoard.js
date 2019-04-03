@@ -29,9 +29,10 @@ class GameBoard extends Component {
   }
   
   goToStats = () => {
-    this.setState({
-      view: "Stats",
-    });
+    console.log("hellofuckers");
+    // this.setState({
+    //   view: "Stats",
+    // });
   }
 
   render() {

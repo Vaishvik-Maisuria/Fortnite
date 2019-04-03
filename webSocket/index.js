@@ -146,9 +146,7 @@ function handleClientAction(data, ws){
 	switch (data.type) {
 		case 'deadPlayer':
 			mainStage.removePlayer(data.playerIndex)
-			console.log('Player removed. totalPlayers', mainStage.actors.length);
-		
-			
+			console.log('Player removed. totalPlayers', mainStage.actors.length);	
 			break
 		case 'userName':
 			//Data has the usernamem
@@ -160,13 +158,8 @@ function handleClientAction(data, ws){
 		case 'pickup':
 			console.log("-------------------------------picking up");
 			// mainStage.player.setPickup(true);
-			console.log('ammo Before', mainStage.actors[data.playerIndex].amunition);
-
 			mainStage.setPickUpPlayer(data.playerIndex)
-			
-			console.log('ammo Added', mainStage.actors[data.playerIndex].amunition);
-			
-
+	
 			break;
 		case 'movement':
 			// console.log('---------------------------- Key Movement');
