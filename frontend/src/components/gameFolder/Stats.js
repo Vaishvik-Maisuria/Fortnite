@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
 import $ from 'jquery'
+import { throws } from 'assert';
 
 
 class Stats extends Component {
@@ -8,53 +9,42 @@ class Stats extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      players: []
+      players: null,
+      check: false,
+      player: null
     };
 
-    // this.getProfile = this.getProfile.bind(this)
   }
   
   componentDidMount() {
-    this.getProfile()
+      this.getProfile()
+      console.log('after ajax call');
+      
+    
   }
 
-  getProfile() {
+  getProfile = () => {
    $.ajax({
       method: "GET",
       url: "/api/users/",
     }).done(function (data, text_status, jqXHR) {
-      // console.log(text_status);
-      // console.log(jqXHR.status);
       this.setState({
         players: data.data
-      });
+      })
+ 
       console.log('log data ',data.data);
-      
       /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
     }.bind(this)).fail(function (err) {
       let response = {};
       if ("responseJSON" in err) response = err.responseJSON;
       else response = { error: { "Server Error": err.status } };
-
+      return 'err'
       // f(response, false);
       /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
     });
   }
 
-  render() {
-    
-    if (this.state.players == null){
-      return <div />
-    }
-
-    const playerList = this.state.players.map((item) =>{
-      // console.log(item);
-      <tr>
-        <td>{item.username}</td>
-        <td>{ item.wins + '' + item.loses } </td>
-      </tr>
-    })
-
+  render() {    
     return (
       <div className="row container">
         <div className="card" style={{margin: '2%', paddingBottom:'2%'}} >
@@ -75,7 +65,19 @@ class Stats extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {playerList}
+                    {this.state.players != null?
+                      this.state.players.map((item, index) => {
+                        console.log('idnex:', index);
+                        return(
+                          <tr>
+                            <td>{item.username}</td>
+                            <td>{item.wins + '/' + item.loses}</td>
+                          </tr>
+                        )
+                      })
+                      :
+                      null
+                    }
                 </tbody>
               </table>
             </div>
