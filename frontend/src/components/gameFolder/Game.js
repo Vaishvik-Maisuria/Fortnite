@@ -19,8 +19,16 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      width: window.innerWidth,
       socket: null,
       id: ID(),
+      ax: 0,
+      ay: 0,
+      az: 0,
+      currentX: 0,
+      canvasWidth: 700,
+      canvasHeight: 700,
+      acceleration: null,
       player: null,
       playerIndex: 0,
       mouseMovementData: {
@@ -33,10 +41,27 @@ class Game extends Component {
     };
   }
 
+
+  handleWindowSizeChange = () => {
+    this.setState({ width: window.innerWidth });
+  };
+
   componentWillMount() {
+    window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
-      socket: new WebSocket("ws://localhost:8001")
+      socket: new WebSocket("ws://142.1.5.182:8001")
     })
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
+  }
+  init = () => {
+    if ((window.DeviceMotionEvent) || ('listenForDeviceMovement' in window)) {
+      window.addEventListener('devicemotion', this.deviceMotionHandler3, false);
+    } else {
+      document.getElementById("dmEvent").innerHTML = "Not supported on your device or browser.  Sorry."
+    }
   }
 
   componentDidMount() {
@@ -48,10 +73,37 @@ class Game extends Component {
     // document.addEventListener('mouseMove', this.handleMouseMovement)
     canvas.addEventListener("click", this.handleMouseClick);
     canvas.addEventListener("mousemove", this.handleMouseMovement);
+
+    // touch listensers 
+    canvas.addEventListener('touchmove', this.handleTouchMove)
+    canvas.addEventListener('touchstart', this.handleTouchStart);
+
+    // device motion 
+    // window.addEventListener('devicemotion', this.handleDeviceMotion, true);
+
     setInterval(() => {
       this.sendData(this.state.mouseMovementData)
     }, 400)
 
+  }
+
+  
+  handleTouchStart = (event) => {
+    console.log('start');
+  }
+
+  handleTouchMove = (event) => {
+    event.preventDefault();
+    let fingerx = event.touches[0].pageX;
+    let fingery = event.touches[0].pageY;
+    const mouseMovementData = {
+      playerIndex: this.state.playerIndex,
+      id: this.state.id,
+      type: 'mouseClick',
+      x: fingerx,
+      y: fingery
+    }
+    this.sendData(mouseMovementData)
   }
 
   handleMouseClick = (event) => {
@@ -65,7 +117,7 @@ class Game extends Component {
       y: mousePos.y
     }
     // console.log('mouse clicked');
-    
+
     this.sendData(mouseMovementData)
 
   }
@@ -114,9 +166,6 @@ class Game extends Component {
       // console.log("Key is pressed");
       this.sendData(keyPressData)
     }
-
-
-
   }
 
   initializeSocketOperations = (canvas) => {
@@ -143,7 +192,7 @@ class Game extends Component {
       if (ids.includes(id)) {
 
         const playerIndex = ids.indexOf(id)
-        if (config[playerIndex].dead){
+        if (config[playerIndex].dead) {
           //Player is dead
           const data = {
             type: 'deadPlayer',
@@ -154,10 +203,10 @@ class Game extends Component {
           console.log('Player is dead');
 
           // this.props.goToStats()
-          
-          
-        }else {
-        
+
+
+        } else {
+
           if (this.state.player == null || this.state.playerIndex != playerIndex) {
             //assign the new player
             this.setState({
@@ -165,7 +214,7 @@ class Game extends Component {
               playerIndex: playerIndex
             })
             // console.log('#-----------------', config[playerIndex]);
-            
+
             draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
           } else {
             //change the position
@@ -200,20 +249,50 @@ class Game extends Component {
 
 
   render() {
+    const { width } = this.state;
+    const isMobile = width <= 500;
 
-    return (
-      <div className={styles.center}>
-        <div class={styles.ui_top} id="ui_play">
-          <center>
-            <canvas ref="canvas"
-              width={700} height={700}
-              style={{ border: '1px solid black' }}
-            />
-            {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
-          </center>
+    if (isMobile) {
+      return (
+        <div className={styles.center}>
+          <div class={styles.ui_top} id="ui_play">
+            <center>
+              
+              <canvas ref="canvas"
+                width={700} height={700}
+                style={{ border: '1px solid black' }}
+              />
+             
+              {this.state.acceleration} 
+              {/* {this.state.ay} 
+              {this.state.az}          */}
+
+              {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
+            </center>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div className={styles.center}>
+          <div class={styles.ui_top} id="ui_play">
+            <center>
+        
+              {/* {this.state.ax} 
+              {this.state.ay} 
+              {this.state.az}  */}
+        
+
+              <canvas ref="canvas"
+                width={700} height={700}
+                style={{ border: '1px solid black' }}
+              />
+              {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
+            </center>
+          </div>
+        </div>
+      );
+    }
   }
 }
 
