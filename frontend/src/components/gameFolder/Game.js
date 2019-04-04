@@ -53,13 +53,17 @@ class Game extends Component {
     // document.addEventListener('mouseMove', this.handleMouseMovement)
     canvas.addEventListener("click", this.handleMouseClick);
     canvas.addEventListener("mousemove", this.handleMouseMovement);
-    var intVal = setInterval(() => {
+    // var intVal = setInterval(() => {
+    //   this.sendData(this.state.mouseMovementData)
+    // }, 400)
+    setInterval(() => {
       this.sendData(this.state.mouseMovementData)
     }, 400)
 
-    this.setState({
-      mouseInterval: intVal
-    })
+
+    // this.setState({
+    //   mouseInterval: intVal
+    // })
 
   }
 
@@ -154,6 +158,8 @@ class Game extends Component {
         const playerIndex = ids.indexOf(id)
         if (config[playerIndex].dead){
           //Player is dead
+          console.log('in here');
+          
           const data = {
             type: 'deadPlayer',
             playerIndex: playerIndex
@@ -163,7 +169,7 @@ class Game extends Component {
           console.log('Player is dead');
           console.log('Who shot him?', config[playerIndex].killedBy);
           
-          clearInterval(this.state.mouseInterval)
+          // clearInterval(this.state.mouseInterval)
           this.setState({
             playerDead: true
           })
