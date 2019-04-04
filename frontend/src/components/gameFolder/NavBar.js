@@ -103,27 +103,27 @@ class NavBar extends Component {
 
     handlePlayMenuOpen = event => {
         this.setState({ anchorEl: event.currentTarget });
-        this.props.view(event.currentTarget.name);
+        this.props.view("Game");
     };
 
     handleInstructionMenuOpen = event => {
         this.setState({ anchorEl: event.currentTarget });
-        this.props.view(event.currentTarget.name);
+        this.props.view("Instruction");
     };
 
     handleStatsMenuOpen = event => {
         this.setState({ anchorEl: event.currentTarget });
-        this.props.view(event.currentTarget.name);
+        this.props.view("Stats");
     };
 
     handleProfileMenuOpen = event => {
         this.setState({ anchorEl: event.currentTarget });
-        this.props.view(event.currentTarget.name);
+        this.props.view("Profile");
     };
 
     handleLogOutMenuOpen = event => {
         this.setState({ anchorEl: event.currentTarget });
-        this.props.view(event.currentTarget.name);
+        this.props.view("LogOut");
     };
 
     handleMenuClose = () => {
@@ -162,7 +162,7 @@ class NavBar extends Component {
                     </IconButton>
                     <p>Players</p>
                 </MenuItem>
-                <MenuItem onClick={this.handleMobileMenuClose}>
+                <MenuItem onClick={this.handlePlayMenuOpen}>
                     <IconButton onClick={this.handlePlayMenuOpen} name="Game" color="inherit">
                         <Badge color="secondary">
                             <PlayArrow />
@@ -170,7 +170,7 @@ class NavBar extends Component {
                     </IconButton>
                     <p>Play</p>
                 </MenuItem>
-                <MenuItem onClick={this.handleProfileMenuOpen}>
+                <MenuItem onClick={this.handleInstructionMenuOpen}>
                     <IconButton onClick={this.handleInstructionMenuOpen} name="Instruction" color="inherit">
                         <Badge color="secondary">
                             <Description />
@@ -178,7 +178,7 @@ class NavBar extends Component {
                     </IconButton>
                     <p>Instruction</p>
                 </MenuItem>
-                <MenuItem onClick={this.handleProfileMenuOpen}>
+                <MenuItem onClick={this.handleStatsMenuOpen}>
                     <IconButton onClick={this.handleStatsMenuOpen} name="Stats" color="inherit">
                         <Badge badgeContent={1} color="secondary">
 
@@ -196,7 +196,7 @@ class NavBar extends Component {
                     </IconButton>
                     <p>Profile</p>
                 </MenuItem>
-                <MenuItem onClick={this.handleProfileMenuOpen}>
+                <MenuItem onClick={this.handleLogOutMenuOpen}>
                     <IconButton aria-haspopup="true" onClick={this.handleLogOutMenuOpen} name="LogOut" color="inherit">
                         <FullscreenExitRounded />
 
