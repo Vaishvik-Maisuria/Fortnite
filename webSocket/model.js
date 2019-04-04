@@ -383,6 +383,8 @@ class Tank extends Actor {
 		this.id = 0
 		this.turtPosition = this.getTurretPosition()
 		this.dead = false
+		this.killedBy = ''
+		this.kills = 0
 	}
 
 	assignId(id){
@@ -423,7 +425,7 @@ class Tank extends Actor {
 			// console.log("In the tanks ")
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
-			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
+			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5, this.id);
 			this.stage.addBullets(bullet);
 			// console.log("step function is getting called and bullet is getting added to the stage");
 			// this.stage.addActor(bullet);
@@ -493,17 +495,36 @@ class Opponent extends Tank {
 }
 
 class Bullet extends Actor {
-	constructor(stage, position, velocity, colour, radius){
+	constructor(stage, position, velocity, colour, radius, actorId){
 		super(stage, position, velocity, colour, radius);
 		this.lifetime = 200;
 		this.actorType = 'Bullet'
+		this.actorId = actorId
 	}
 
 	collide(other, newState){
 		this.makeZombie();
 		other.health--;
 
-		if(other.health<=0)other.makeZombie();
+		if(other.health<=0){
+			//player is now dead
+			other.killedBy = this.actorId
+			// if (other.actorType == 'Tank'){
+			// 	this.assignKill()
+			// }
+			other.makeZombie();
+		}
+	}
+
+	//increment kill
+	assignKill() {
+		const playerIndex = this.stage.playersID.indexOf(this.actorId)
+		console.log('playerIndex', playerIndex);
+		
+		this.stage.actors[playerIndex].kills += 1
+
+		console.log('Total Kills', this.stage.actors[playerIndex].kills );
+		
 	}
 
 	step(){

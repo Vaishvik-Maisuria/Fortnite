@@ -218,6 +218,7 @@ export function drawTurret(context, player, turretPos){
 export function drawBullet(context, bullet) {
 	// console.log("Drawing bullet");
 	// console.log(bullet.position);
+	console.log('Player who shot this', bullet.actorId);
 	
 	
 	context.fillStyle = bullet.colour;

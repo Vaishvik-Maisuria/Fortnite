@@ -161,6 +161,8 @@ class Game extends Component {
           this.sendData(data)
           this.state.socket.close()
           console.log('Player is dead');
+          console.log('Who shot him?', config[playerIndex].killedBy);
+          
           clearInterval(this.state.mouseInterval)
           this.setState({
             playerDead: true
@@ -175,8 +177,7 @@ class Game extends Component {
               player: config[playerIndex],
               playerIndex: playerIndex
             })
-            // console.log('#-----------------', config[playerIndex]);
-            
+           
             draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
           } else {
             //change the position

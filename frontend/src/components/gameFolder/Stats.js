@@ -64,12 +64,12 @@ class Stats extends Component {
 
             <div className=" deep-purple darken-3 card-panel" style={{margin: '5%', height:'25%'}}>
               {this.state.player!=null? 
-                <h2 className="white-text text-darken-3">{this.state.player.wins + '/' + this.state.player.loses}</h2>
+                <h2 className="white-text text-darken-3">{this.state.player.kills}</h2>
                 :
                 null
               }
              
-              <text className="white-text">WIN/LOSE Ratio</text>
+              <text className="white-text">Total Kills</text>
             </div>
 
             <h2>Scoreboard</h2>
@@ -78,7 +78,7 @@ class Stats extends Component {
                 <thead>
                   <tr>
                       <th>Player Name</th>
-                      <th>Ratio</th>
+                      <th>Kills</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -88,7 +88,7 @@ class Stats extends Component {
                         return(
                           <tr>
                             <td>{item.username}</td>
-                            <td>{item.wins + '/' + item.loses}</td>
+                            <td>{item.kills}</td>
                           </tr>
                         )
                       })
