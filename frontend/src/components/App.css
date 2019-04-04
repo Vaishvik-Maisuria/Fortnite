@@ -45,6 +45,17 @@
 .center {
   text-align: center
 }
+.gradient {
+  background-image:
+    linear-gradient(
+      to right, 
+      red, #f06d06
+    );
+}
+
+.center-me {
+  margin: 0 auto;
+}
 
 .gameboard_container {
   text-align: center;
