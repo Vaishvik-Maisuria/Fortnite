@@ -79,7 +79,14 @@ class Stage {
 	mouseMovePlayer(x,y, playerIndex){
 		var canvasPosition=new Pair(x,y);
 		var worldPosition = this.mapCanvasToWorldPlayer(canvasPosition, playerIndex)
-		this.actors[playerIndex].pointTurret(worldPosition)
+		console.log('Player Dead status', this.actors[playerIndex].dead);
+		
+		// if (this.actors[playerIndex].health > 0 && this.actors[[playerIndex].actorType == 'Tank']){
+		// 	console.log('Player INdex', playerIndex);
+			
+		// 	this.actors[playerIndex].pointTurret(worldPosition)
+
+		// }
 	}
 
 	// Map an canvas coordinates to world coordinates
@@ -499,7 +506,7 @@ class Bullet extends Actor {
 		super(stage, position, velocity, colour, radius);
 		this.lifetime = 200;
 		this.actorType = 'Bullet'
-		this.actorId = actorId
+		// this.actorId = actorId
 	}
 
 	collide(other, newState){
@@ -508,7 +515,7 @@ class Bullet extends Actor {
 
 		if(other.health<=0){
 			//player is now dead
-			other.killedBy = this.actorId
+			// other.killedBy = this.actorId
 			// if (other.actorType == 'Tank'){
 			// 	this.assignKill()
 			// }
