@@ -12,10 +12,9 @@ class GameBoard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: "Game"
+      view: "Stats"
     };
     this.changeView = this.changeView.bind(this);
-    this.goToStats = this.changeView.bind(this);
   }
 
   changeView = (viewSelect) => {
@@ -29,10 +28,10 @@ class GameBoard extends Component {
   }
   
   goToStats = () => {
-    console.log("hellofuckers");
-    // this.setState({
-    //   view: "Stats",
-    // });
+    // console.log("hellofuckers");
+    this.setState({
+      view: "Stats",
+    });
   }
 
   render() {
@@ -40,7 +39,7 @@ class GameBoard extends Component {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Game goToStats = {this.goToStats.bind(this)} />
+          <Game user={this.props.user}  goToStats={this.goToStats} />
         </div>
       );
     }
@@ -56,7 +55,7 @@ class GameBoard extends Component {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Stats />
+          <Stats user={this.props.user} />
         </div>
       );
     }
