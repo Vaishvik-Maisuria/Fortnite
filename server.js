@@ -79,12 +79,14 @@ app.post('/api/login', function (req, res) {
 	var password = req.body.password;
 
 	var result = { "error": {} , "success":false};
+	
 	if(user==""){
 		result["error"]["user"]="user not supplied";
 	}
 	if(password==""){
 		result["error"]["password"]="password not supplied";
 	}
+	console.log(result["error"])
 	if(isEmptyObject(result["error"])){
 		let sql = 'SELECT * FROM user WHERE user=? and password=?;';
 		db.get(sql, [user, password], function (err, row){
