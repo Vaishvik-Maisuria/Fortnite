@@ -13,22 +13,20 @@ class LoginDashBoard extends Component {
       isRegisterOpen: true,
     };
     this.changeView = this.changeView.bind(this);
+    this.showLoginBox = this.showLoginBox.bind(this);
   }
 
-  showLoginBox() {
+  showLoginBox = () => {
     this.setState({isLoginOpen: true, isRegisterOpen: false});
   }
 
-  showRegisterBox() {
+  showRegisterBox = () => {
     this.setState({isRegisterOpen: true, isLoginOpen: false});
   }
 
   changeView = (user, password) => {
     this.props.view(user, password);
   }
-
-  
-
 
   render() {
 
@@ -57,13 +55,11 @@ class LoginDashBoard extends Component {
         <div className={styles.box_container}>
           <div className={styles.box_controller}>
             {loginDiv}
-            
             {registerDiv}
-            
           </div>
           
           {this.state.isLoginOpen && <Login view={this.changeView.bind(this)}/>}
-          {this.state.isRegisterOpen && <Registration login = {this.showLoginBox.bind(this)}/>}
+          {this.state.isRegisterOpen && <Registration showlogin={this.showLoginBox.bind(this)}/>}
         </div>
       </div>
       

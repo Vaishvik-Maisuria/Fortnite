@@ -49,10 +49,10 @@ class Registration extends Component {
 		}).done(function (data, text_status, jqXHR) {
 			console.log(text_status);
 			console.log(jqXHR.status);
-			this.props.login();
+			this.props.showlogin();
 			// showUI("#ui_login");
 			/** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-		}).fail(function (err) {
+		}.bind(this)).fail(function (err) {
 			let response = {};
 			if ("responseJSON" in err) response = err.responseJSON;
 			else response = { error: { "Server Error": err.status } };

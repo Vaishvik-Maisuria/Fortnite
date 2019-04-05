@@ -51,7 +51,7 @@ class Game extends Component {
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
-      socket: new WebSocket("ws://142.1.5.182:8001")
+      socket: new WebSocket("ws://192.168.2.18:8001")
     })
   }
 
@@ -293,7 +293,7 @@ class Game extends Component {
         
               {/* {this.state.ax} 
               {this.state.ay} 
-              {this.state.az}  */
+              {this.state.az}  */}
 
               <canvas ref="canvas"
                 width={700} height={700}
