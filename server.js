@@ -228,6 +228,32 @@ app.put('/api/user/:user', function (req, res) {
 	}
 });
 
+// /api/user/addKills/
+
+app.put('/api/user/addKills/', function (req, res) {
+	console.log('in add kills');
+	
+	var result = { error: validateUser(req.body) , success:false};
+	if(isEmptyObject(result["error"])){
+		let sql = 'SELECT * FROM score WHERE username=?'
+		let d = req.body;
+		console.log(d);
+		
+
+		db.get(sql, [d.userName], function(err, row){
+			if (err) {
+				res.status(500); 
+				result["error"]["db"] = err.message;
+			}else {
+				console.log('row score', row);
+				
+			}
+		})
+	}
+		
+		
+});
+
 // Update user
 app.put('/api/user/:user', function (req, res) {
 	var result = { error: validateUser(req.body) , success:false};
