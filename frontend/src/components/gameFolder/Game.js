@@ -53,17 +53,44 @@ class Game extends Component {
     console.log(check);
 
     $.ajax({
-      type: 'PUT',
-      url: '/api/user/addKills/',
+      method: "PUT",
+      url: "/api/user/addKills/user=" + this.props.user,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
       data: check,
-      success: function() {
-        console.log(Success);
+    }).done(function (data, text_status, jqXHR) {
+      console.log(text_status);
+      console.log(jqXHR.status);
+      console.log(data)
+
+      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
+    }).fail(function (err) {
+      let response = {};
+      if ("responseJSON" in err) response = err.responseJSON;
+      else response = { error: { "Server Error": err.status } };
+      f(response, false);
+      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+    });
+
+
+
+
+
+
+
+    $.ajax({
+			type: "PUT",
+			url: '/api/user/addKills/user=' + this.props.user,
+			contentType: "application/json",
+      data: check, // serializes the form's elements.
+      
+		}).done(function (data, text_status, jqXHR){
+        console.log();
         
-      }
     })
     
     // $.ajax({
-		// 	method: "PUT",
+		// 	method: "POST",
 		// 	url: "/api/user/addKills/",
 		// 	contentType: "application/json; charset=utf-8",
 		// 	dataType: "json",
@@ -77,7 +104,6 @@ class Game extends Component {
 		// }).fail(function (err) {
     //   console.log('unsuccessfull');
     //   console.log(err);
-      
       
 		// 	// let response = {};
 		// 	// if ("responseJSON" in err) response = err.responseJSON;

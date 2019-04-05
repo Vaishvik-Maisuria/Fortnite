@@ -230,26 +230,33 @@ app.put('/api/user/:user', function (req, res) {
 
 // /api/user/addKills/
 
-app.put('/api/user/addKills/', function (req, res) {
+app.put('/api/user/addKills/:user', function (req, res) {
 	console.log('in add kills');
+	console.log("Data", req.body);
+
+	var result = { data: null, success: false}
+	result.data = "Something New";
+	result.success = true;
+	res.status(200)
+	res.send(result)
 	
-	var result = { error: validateUser(req.body) , success:false};
-	if(isEmptyObject(result["error"])){
-		let sql = 'SELECT * FROM score WHERE username=?'
-		let d = req.body;
-		console.log(d);
+	// var result = { error: validateUser(req.body) , success:false};
+	// if(isEmptyObject(result["error"])){
+	// 	let sql = 'SELECT * FROM score WHERE username=?'
+	// 	let d = req.body;
+	// 	console.log(d);
 		
 
-		db.get(sql, [d.userName], function(err, row){
-			if (err) {
-				res.status(500); 
-				result["error"]["db"] = err.message;
-			}else {
-				console.log('row score', row);
+	// 	db.get(sql, [d.userName], function(err, row){
+	// 		if (err) {
+	// 			res.status(500); 
+	// 			result["error"]["db"] = err.message;
+	// 		}else {
+	// 			console.log('row score', row);
 				
-			}
-		})
-	}
+	// 		}
+	// 	})
+	// }
 		
 		
 });
