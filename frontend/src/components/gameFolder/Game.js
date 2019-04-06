@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
+import $ from 'jquery'
 import { draw, mouseMove, getMousePos } from './drawing'
 // import GameController from './GameController';
 // import WebSocket from 'ws'
@@ -39,7 +40,8 @@ class Game extends Component {
         type: 'none',
         x: 0,
         y: 0
-      }
+      },
+      totalKills: 0
     };
   }
 
@@ -51,19 +53,92 @@ class Game extends Component {
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
-      socket: new WebSocket("ws://192.168.2.18:8001")
+      socket: new WebSocket("ws://localhost:8001")
     })
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowSizeChange);
   }
+  
   init = () => {
     if ((window.DeviceMotionEvent) || ('listenForDeviceMovement' in window)) {
       window.addEventListener('devicemotion', this.deviceMotionHandler3, false);
     } else {
       document.getElementById("dmEvent").innerHTML = "Not supported on your device or browser.  Sorry."
     }
+  }
+  // componentWillUnmount() {
+  //   this.updateDatabase()
+  // }
+
+  updateDatabase = () => {
+    var check = this.state
+    check['userName'] = this.props.user
+    console.log(check);
+
+    $.ajax({
+      method: "PUT",
+      url: "/api/user/addKills/user=" + this.props.user,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: check,
+    }).done(function (data, text_status, jqXHR) {
+      console.log(text_status);
+      console.log(jqXHR.status);
+      console.log(data)
+
+      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
+    }).fail(function (err) {
+      let response = {};
+      if ("responseJSON" in err) response = err.responseJSON;
+      else response = { error: { "Server Error": err.status } };
+      f(response, false);
+      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+    });
+
+
+
+
+
+
+
+    $.ajax({
+			type: "PUT",
+			url: '/api/user/addKills/user=' + this.props.user,
+			contentType: "application/json",
+      data: check, // serializes the form's elements.
+      
+		}).done(function (data, text_status, jqXHR){
+        console.log();
+        
+    })
+    
+    // $.ajax({
+		// 	method: "POST",
+		// 	url: "/api/user/addKills/",
+		// 	contentType: "application/json; charset=utf-8",
+		// 	dataType: "json",
+		// 	data: JSON.stringify(check)
+		// }).done(function (data, text_status, jqXHR) {
+		// 	console.log(text_status);
+		// 	console.log(jqXHR.status);
+		// 	// this.props.login();
+		// 	// showUI("#ui_login");
+		// 	/** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
+		// }).fail(function (err) {
+    //   console.log('unsuccessfull');
+    //   console.log(err);
+      
+		// 	// let response = {};
+		// 	// if ("responseJSON" in err) response = err.responseJSON;
+		// 	// else response = { error: { "Server Error": err.status } };
+		// 	// if ("db" in response.error && response.error.db == "SQLITE_CONSTRAINT: UNIQUE constraint failed: user.user") {
+		// 	// 	response.error.db = "user already taken";
+		// 	// }
+		// 	// showErrors("#ui_register",response);
+		// 	/** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+		// });
   }
 
   componentDidMount() {
@@ -133,8 +208,6 @@ class Game extends Component {
 
   }
 
-
-
   handleMouseMovement = (event) => {
     const canvas = this.refs.canvas;
     var mousePos = getMousePos(canvas, event);
@@ -201,7 +274,8 @@ class Game extends Component {
 
       var context = canvas.getContext('2d')
       if (ids.includes(id)) {
-
+        
+        
         const playerIndex = ids.indexOf(id)
         if (config[playerIndex].dead) {
           //Player is dead
@@ -209,25 +283,35 @@ class Game extends Component {
             type: 'deadPlayer',
             playerIndex: playerIndex
           }
+          console.log('Player Index', playerIndex);
+          
+          clearInterval(this.state.mouseInterval)
           this.sendData(data)
+          console.log('Killed by: ', config[playerIndex].killedBy);
+          console.log('Total Kills', config[playerIndex].kills);
+          
+          
           this.state.socket.close()
           console.log('Player is dead');
-          clearInterval(this.state.mouseInterval)
           this.setState({
-            playerDead: true
+            playerDead: true,
+            totalKills: config[playerIndex].kills
           })
-          // this.props.goToStats()
+          this.props.goToStats()
 
         }else {
-        
-          if (this.state.player == null || this.state.playerIndex != playerIndex) {
+          
+          if (this.state.playerIndex != playerIndex || this.state.player == null) {
             //assign the new player
+            console.log('local playerINdex', this.state.playerIndex);
+            console.log(playerIndex);
+            
+            
             this.setState({
               player: config[playerIndex],
               playerIndex: playerIndex
             })
             // console.log('#-----------------', config[playerIndex]);
-
             draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
           } else {
             //change the position

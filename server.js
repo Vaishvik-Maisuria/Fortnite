@@ -230,6 +230,47 @@ app.put('/api/user/:user', function (req, res) {
 	}
 });
 
+// /api/user/addKills/
+
+app.put('/api/user/addKills/:user', function (req, res) {
+	console.log('in add kills');
+	console.log("Data", req.body);
+
+	var result = { data: null, success: false, error: {}}
+	result.data = "Something New";
+	if(isEmptyObject(result["error"])){
+		// let sql = 'SELECT * FROM score WHERE username=?'
+		let sql = "UPDATE score SET score=(Select score from score where username=?) + ? where username=?;"
+		let d = req.body;
+
+		db.get(sql, [d.userName,10,d.kills ], function(err, row){
+			if (err) {
+				res.status(500); 
+				result["error"]["db"] = err.message;
+			}else {
+				// console.log(row);
+				// updateScore(row, d.kills)
+				res.status(200);
+				
+				// if(this.changes!=1){
+				// 	result["error"]["db"] = "Not updated";
+				// 	res.status(404);
+				// } else {
+				// 	
+				// 	console.log('row score', row);
+				// 	result.success = true;
+				// }	
+			}
+			// res.json(result);
+		});
+	} else {
+		res.status(400);
+		res.json(result);
+	}
+});
+
+
+
 // Update user
 app.put('/api/user/:user', function (req, res) {
 	var result = { error: validateUser(req.body) , success:false};
