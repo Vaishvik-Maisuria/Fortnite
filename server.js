@@ -241,14 +241,15 @@ app.put('/api/user/addKills/:user', function (req, res) {
 		let sql = "UPDATE score SET score=(Select score from score where username=?) + ? where username=?;"
 		let d = req.body;
 
-		db.get(sql, [d.userName,10,d.userName ], function(err, row){
+		db.get(sql, [d.userName,10,d.kills ], function(err, row){
 			if (err) {
 				res.status(500); 
 				result["error"]["db"] = err.message;
 			}else {
-				console.log(row);
+				// console.log(row);
 				// updateScore(row, d.kills)
 				res.status(200);
+				
 				// if(this.changes!=1){
 				// 	result["error"]["db"] = "Not updated";
 				// 	res.status(404);

@@ -43,9 +43,9 @@ class Game extends Component {
     })
   }
 
-  componentWillUnmount() {
-    this.updateDatabase()
-  }
+  // componentWillUnmount() {
+  //   this.updateDatabase()
+  // }
 
   updateDatabase = () => {
     var check = this.state
