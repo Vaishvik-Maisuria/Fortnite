@@ -9,6 +9,7 @@ const path = require("path");
 const app = express();
 
 // app uses the following
+var url = require('url');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(pino);
 app.use('/', express.static(path.join(__dirname, '/frontend/dist')));
@@ -200,7 +201,7 @@ app.post('/api/user/:user', function (req, res) {
 });
 
 // Update user
-app.put('/api/user/:user', function (req, res) {
+app.put('/api/user/', function (req, res) {
 	var result = { error: validateUser(req.body) , success:false};
 	if(isEmptyObject(result["error"])){
 		let sql = 'UPDATE user SET '+
@@ -232,10 +233,13 @@ app.put('/api/user/:user', function (req, res) {
 
 // /api/user/addKills/
 
-app.put('/api/user/addKills/:user', function (req, res) {
+app.post('/api/user/addKills/:user', function (req, res) {
 	console.log('in add kills');
 	console.log("Data", req.body);
-
+	
+	var params = url.parse(req.url, true).query;
+	console.log(params);
+	
 	var result = { data: null, success: false, error: {}}
 	result.data = "Something New";
 	if(isEmptyObject(result["error"])){

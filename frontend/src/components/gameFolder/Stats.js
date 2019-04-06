@@ -11,7 +11,8 @@ class Stats extends Component {
     this.state = {
       players: null,
       check: false,
-      player: null
+      player: null,
+      data: {}
     };
 
   }
@@ -19,8 +20,51 @@ class Stats extends Component {
   componentDidMount() {
       this.getProfile()
       console.log('after ajax call');
-      
+      this.setState({
+        data: this.props.data
+      })
+      // this.helloworld(this.props.data)
     
+  }
+
+  helloworld =(data) => {
+    let jsonData = this.props.data;
+  
+    // console.log(jsonData.totalKills);
+    $.ajax({
+      method: 'POST',
+      url: '/api/user/addKills/user?' + this.props.user ,
+      // dataType: 
+      data: this.props.data
+    }).done(function (data,text_status, jqXHR){
+      console.log('Complete', );
+      
+    })
+    
+    // $.ajax({
+    //   method: 'GET',
+    //   url: '/api/greeting',
+    // }).done(function (data,text_status, jqXHR){
+    //   console.log('Complete', );
+      
+    // })
+   
+  }
+
+  updateSocer =() => {
+    if (this.props.status == 1){
+      console.log(this.props.data);
+      $.ajax({
+        type: "PUT",
+        url: '/api/user/addKills/' + this.props.user,
+        contentType: "application/json",
+        data: this.props.data, // serializes the form's elements.
+      }).done(function (data, text_status, jqXHR){
+          console.log('Completed');
+          
+      })
+      
+    }
   }
 
   getProfile = () => {
