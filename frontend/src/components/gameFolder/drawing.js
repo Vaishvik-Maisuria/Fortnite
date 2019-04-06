@@ -19,7 +19,7 @@ export function ID() {
 export function toInt(x,y){ return new Pair(Math.round(x), Math.round(y)); }
 
 
-export function draw(context, config, playerIndex, clientPlayer) {
+export function draw(context, config, playerIndex, clientPlayer, windowWidth, windowHeight) {
 	// var context = canvas2.getContext('2d')
 	
     // var player = config[playerIndex]
@@ -39,18 +39,18 @@ export function draw(context, config, playerIndex, clientPlayer) {
 	
 	// console.log("x="+x+" y="+y);
 
-	let xt=-x+700/2;
+	let xt=-x+windowWidth/2;
 	// if(x<this.canvasWidth/2)xt=0;
 	// if(x>this.width-this.canvasWidth/2)xt=-this.width+this.canvasWidth;
 
-	let yt=-y+700/2;
+	let yt=-y+windowHeight/2;
 	// if(y<this.canvasHeight/2)yt=0;
 	// if(y>this.height-this.canvasHeight/2)yt=-this.height+this.canvasHeight;
 
 	context.resetTransform();
 
 	context.fillStyle = '#6f6';
-	context.clearRect(0, 0, 700, 700);
+	context.clearRect(0, 0, windowWidth, windowHeight);
 
 	context.translate(xt,yt);
 	context.fillRect(0, 0, 10000, 10000);
@@ -104,10 +104,10 @@ export function pointTurret(crosshairs, player){
 }
 
 // Map an canvas coordinates to world coordinates
-export function mapCanvasToWorld(canvasPosition, player){
+export function mapCanvasToWorld(canvasPosition, player, windowWidth, windowHeight){
 	player.position = new Pair(player.position.x, player.position.y)
 
-    var halfCanvas = (new Pair(700/2, 700/2)).toInt();
+    var halfCanvas = (new Pair(windowWidth/2, windowHeight/2)).toInt();
     var playerPosition = player.position.toInt();
 
     var worldPosition = canvasPosition.vecAdd(playerPosition.vecSub(halfCanvas));
@@ -115,9 +115,9 @@ export function mapCanvasToWorld(canvasPosition, player){
 }
 
 /** Handle the mouse movement on the stage in canvas coordinates **/
-export function mouseMove(x,y, player){
+export function mouseMove(x,y, player, windowWidth, windowHeight ){
     var canvasPosition=new Pair(x,y);
-    var worldPosition= mapCanvasToWorld(canvasPosition, player);
+    var worldPosition= mapCanvasToWorld(canvasPosition, player, windowWidth, windowHeight);
     var updatedPlayer = pointTurret(worldPosition, player);
     return updatedPlayer
 }

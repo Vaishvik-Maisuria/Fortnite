@@ -21,15 +21,26 @@ class Game extends Component {
     super(props);
     this.state = {
       width: window.innerWidth,
+      windowHeight: window.screen.availHeight - 200,
+      windowWidth: window.screen.availWidth - 22,
       socket: null,
       id: ID(),
-      ax: 0,
-      ay: 0,
-      az: 0,
-      currentX: 0,
-      canvasWidth: 700,
-      canvasHeight: 700,
-      acceleration: null,
+      acceleration: {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      accelerationIncludingGravity: {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      interval: 0,
+      rotationRate: {
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
+      },
       player: null,
       playerIndex: 0,
       mouseInterval: null,
@@ -53,24 +64,15 @@ class Game extends Component {
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
-      socket: new WebSocket("ws://localhost:8001")
+      socket: new WebSocket("ws://142.1.2.146:8001")
     })
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowSizeChange);
+    window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
   }
   
-  init = () => {
-    if ((window.DeviceMotionEvent) || ('listenForDeviceMovement' in window)) {
-      window.addEventListener('devicemotion', this.deviceMotionHandler3, false);
-    } else {
-      document.getElementById("dmEvent").innerHTML = "Not supported on your device or browser.  Sorry."
-    }
-  }
-  // componentWillUnmount() {
-  //   this.updateDatabase()
-  // }
 
   updateDatabase = () => {
     var check = this.state
@@ -97,12 +99,6 @@ class Game extends Component {
       /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
     });
 
-
-
-
-
-
-
     $.ajax({
 			type: "PUT",
 			url: '/api/user/addKills/user=' + this.props.user,
@@ -113,54 +109,33 @@ class Game extends Component {
         console.log();
         
     })
-    
-    // $.ajax({
-		// 	method: "POST",
-		// 	url: "/api/user/addKills/",
-		// 	contentType: "application/json; charset=utf-8",
-		// 	dataType: "json",
-		// 	data: JSON.stringify(check)
-		// }).done(function (data, text_status, jqXHR) {
-		// 	console.log(text_status);
-		// 	console.log(jqXHR.status);
-		// 	// this.props.login();
-		// 	// showUI("#ui_login");
-		// 	/** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-		// }).fail(function (err) {
-    //   console.log('unsuccessfull');
-    //   console.log(err);
-      
-		// 	// let response = {};
-		// 	// if ("responseJSON" in err) response = err.responseJSON;
-		// 	// else response = { error: { "Server Error": err.status } };
-		// 	// if ("db" in response.error && response.error.db == "SQLITE_CONSTRAINT: UNIQUE constraint failed: user.user") {
-		// 	// 	response.error.db = "user already taken";
-		// 	// }
-		// 	// showErrors("#ui_register",response);
-		// 	/** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
-		// });
   }
 
   componentDidMount() {
+
+    // this.setState({
+    //   windowHeight:window.screen.availHeight - 155,
+    //   windowWidth: window.screen.availWidth - 22,
+    // })
+
     if(this.state.playerDead){
       this.props.goToStats()
     }
     const canvas = this.refs.canvas;
-    const ctx = canvas.getContext("2d");
 
-    this.initializeSocketOperations(canvas)
+    this.initializeSocketOperations(canvas);
+
     document.addEventListener('keydown', this.handleKeyPress)
-    // document.addEventListener('mouseMove', this.handleMouseMovement)
     canvas.addEventListener("click", this.handleMouseClick);
     canvas.addEventListener("mousemove", this.handleMouseMovement);
 
 
-    // touch listensers 
+    // // touch listensers 
     canvas.addEventListener('touchmove', this.handleTouchMove)
     canvas.addEventListener('touchstart', this.handleTouchStart);
 
     // device motion 
-    // window.addEventListener('devicemotion', this.handleDeviceMotion, true);
+    window.addEventListener('devicemotion', this.handleDeviceMotion, true);
 
   
     var intVal = setInterval(() => {
@@ -173,12 +148,15 @@ class Game extends Component {
 
   }
 
+  handleDeviceMotion = event => {
+    const { acceleration, accelerationIncludingGravity, interval, rotationRate } = event;
+    this.setState({ acceleration, accelerationIncludingGravity, interval, rotationRate });
+  };
+
   
   handleTouchStart = (event) => {
     console.log('start');
-  }
-
-  handleTouchMove = (event) => {
+    
     event.preventDefault();
     let fingerx = event.touches[0].pageX;
     let fingery = event.touches[0].pageY;
@@ -189,7 +167,30 @@ class Game extends Component {
       x: fingerx,
       y: fingery
     }
-    this.sendData(mouseMovementData)
+    this.setState({
+      mouseMovementData: mouseMovementData,
+      player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
+    })
+    
+    // this.sendData(mouseMovementData)
+  }
+
+  handleTouchMove = (event) => {
+    // console.log('move');
+    // event.preventDefault();
+    // let fingerx = event.touches[0].pageX;
+    // let fingery = event.touches[0].pageY;
+    // const mouseMovementData = {
+    //   playerIndex: this.state.playerIndex,
+    //   id: this.state.id,
+    //   type: 'mouseMovement',
+    //   x: fingerx,
+    //   y: fingery
+    // }
+    // this.setState({
+    //   mouseMovementData: mouseMovementData,
+    //   player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player)
+    // })
   }
 
   handleMouseClick = (event) => {
@@ -277,7 +278,10 @@ class Game extends Component {
         
         
         const playerIndex = ids.indexOf(id)
+      
         if (config[playerIndex].dead) {
+          console.log("I  got Killed becuz i am a pussy ");
+          
           //Player is dead
           const data = {
             type: 'deadPlayer',
@@ -312,7 +316,7 @@ class Game extends Component {
               playerIndex: playerIndex
             })
             // console.log('#-----------------', config[playerIndex]);
-            draw(context, config, playerIndex, config[playerIndex]) //on the initial Drawing
+            draw(context, config, playerIndex, config[playerIndex], this.state.windowWidth, this.state.windowHeight) //on the initial Drawing
           } else {
             //change the position
             //we only want the turretDirection
@@ -325,7 +329,7 @@ class Game extends Component {
               player: temp
             })
             //player has been assigned
-            draw(context, config, playerIndex, temp) //after the state has changed
+            draw(context, config, playerIndex, temp, this.state.windowWidth, this.state.windowHeight) //after the state has changed
           }
         }
 
@@ -356,14 +360,10 @@ class Game extends Component {
             <center>
               
               <canvas ref="canvas"
-                width={700} height={700}
+                width={this.state.windowWidth} height={this.state.windowHeight}
                 style={{ border: '1px solid black' }}
               />
-             
-              {this.state.acceleration} 
-              {/* {this.state.ay} 
-              {this.state.az}          */}
-
+            
               {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
             </center>
           </div>
@@ -374,11 +374,7 @@ class Game extends Component {
         <div className={styles.center}>
           <div class={styles.ui_top} id="ui_play">
             <center>
-        
-              {/* {this.state.ax} 
-              {this.state.ay} 
-              {this.state.az}  */}
-
+   
               <canvas ref="canvas"
                 width={700} height={700}
                 style={{ border: '1px solid black' }}
