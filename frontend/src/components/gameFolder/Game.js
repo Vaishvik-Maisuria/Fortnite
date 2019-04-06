@@ -23,6 +23,7 @@ class Game extends Component {
       width: window.innerWidth,
       windowHeight: window.screen.availHeight - 200,
       windowWidth: window.screen.availWidth - 22,
+      isMobile: false,
       socket: null,
       id: ID(),
       acceleration: {
@@ -64,6 +65,7 @@ class Game extends Component {
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
+      // socket: new WebSocket("ws://localhost:8001")
       socket: new WebSocket("ws://142.1.2.146:8001")
     })
   }
@@ -72,7 +74,7 @@ class Game extends Component {
     window.removeEventListener('resize', this.handleWindowSizeChange);
     window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
   }
-  
+
 
   updateDatabase = () => {
     var check = this.state
@@ -100,25 +102,29 @@ class Game extends Component {
     });
 
     $.ajax({
-			type: "PUT",
-			url: '/api/user/addKills/user=' + this.props.user,
-			contentType: "application/json",
+      type: "PUT",
+      url: '/api/user/addKills/user=' + this.props.user,
+      contentType: "application/json",
       data: check, // serializes the form's elements.
-      
-		}).done(function (data, text_status, jqXHR){
-        console.log();
-        
+
+    }).done(function (data, text_status, jqXHR) {
+      console.log();
+
     })
   }
 
   componentDidMount() {
-
+    if (this.state.width <= 500){
+      this.setState({
+        isMobile: true
+      })
+    };
     // this.setState({
     //   windowHeight:window.screen.availHeight - 155,
     //   windowWidth: window.screen.availWidth - 22,
     // })
 
-    if(this.state.playerDead){
+    if (this.state.playerDead) {
       this.props.goToStats()
     }
     const canvas = this.refs.canvas;
@@ -137,7 +143,7 @@ class Game extends Component {
     // device motion 
     window.addEventListener('devicemotion', this.handleDeviceMotion, true);
 
-  
+
     var intVal = setInterval(() => {
       this.sendData(this.state.mouseMovementData)
     }, 400)
@@ -151,12 +157,32 @@ class Game extends Component {
   handleDeviceMotion = event => {
     const { acceleration, accelerationIncludingGravity, interval, rotationRate } = event;
     this.setState({ acceleration, accelerationIncludingGravity, interval, rotationRate });
+
+
+    var x = Math.round(accelerationIncludingGravity.x) / 2;
+    var y = Math.round(accelerationIncludingGravity.y) / 2;
+    // var z = Math.round(accelerationIncludingGravity.z);
+
+    const keyPressData = {
+      x: -x,
+      y: y,
+      id: this.state.id,
+      playerIndex: this.state.playerIndex,
+      type: 'movement'
+    }
+
+    // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
+    // console.log("Key is pressed");
+    this.sendData(keyPressData)
+    
+    // console.log(x,y,z);
+    // console.log(tiltFB);
   };
 
-  
+
   handleTouchStart = (event) => {
     console.log('start');
-    
+
     event.preventDefault();
     let fingerx = event.touches[0].pageX;
     let fingery = event.touches[0].pageY;
@@ -167,11 +193,12 @@ class Game extends Component {
       x: fingerx,
       y: fingery
     }
+    
     this.setState({
       mouseMovementData: mouseMovementData,
       player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
     })
-    
+
     // this.sendData(mouseMovementData)
   }
 
@@ -223,7 +250,7 @@ class Game extends Component {
     // console.log(mouseMovementData);
     this.setState({
       mouseMovementData: mouseMovementData,
-      player: mouseMove(mousePos.x, mousePos.y, this.state.player)
+      player: mouseMove(mousePos.x, mousePos.y, this.state.player, 700, 700)
     })
     // console.log("Mouse moving");
 
@@ -232,7 +259,7 @@ class Game extends Component {
   handleKeyPress = (event) => {
     var key = event.key;
     console.log(this.state.id);
-
+   
     if (key in moveMap2) {
       const keyPressData = {
         x: moveMap2[key][0],
@@ -275,26 +302,26 @@ class Game extends Component {
 
       var context = canvas.getContext('2d')
       if (ids.includes(id)) {
-        
-        
+
+
         const playerIndex = ids.indexOf(id)
-      
+
         if (config[playerIndex].dead) {
           console.log("I  got Killed becuz i am a pussy ");
-          
+
           //Player is dead
           const data = {
             type: 'deadPlayer',
             playerIndex: playerIndex
           }
           console.log('Player Index', playerIndex);
-          
+
           clearInterval(this.state.mouseInterval)
           this.sendData(data)
           console.log('Killed by: ', config[playerIndex].killedBy);
           console.log('Total Kills', config[playerIndex].kills);
-          
-          
+
+
           this.state.socket.close()
           console.log('Player is dead');
           this.setState({
@@ -303,20 +330,25 @@ class Game extends Component {
           })
           this.props.goToStats()
 
-        }else {
-          
+        } else {
+
           if (this.state.playerIndex != playerIndex || this.state.player == null) {
             //assign the new player
             console.log('local playerINdex', this.state.playerIndex);
             console.log(playerIndex);
-            
-            
+
+
             this.setState({
               player: config[playerIndex],
               playerIndex: playerIndex
             })
             // console.log('#-----------------', config[playerIndex]);
-            draw(context, config, playerIndex, config[playerIndex], this.state.windowWidth, this.state.windowHeight) //on the initial Drawing
+            if (this.state.isMobile){
+              draw(context, config, playerIndex, config[playerIndex], this.state.windowWidth, this.state.windowHeight) //on the initial Drawing
+            }else{
+              draw(context, config, playerIndex, config[playerIndex], 700, 700) //on the initial Drawing
+            }
+            
           } else {
             //change the position
             //we only want the turretDirection
@@ -329,7 +361,12 @@ class Game extends Component {
               player: temp
             })
             //player has been assigned
-            draw(context, config, playerIndex, temp, this.state.windowWidth, this.state.windowHeight) //after the state has changed
+            if (this.state.isMobile){
+              draw(context, config, playerIndex, temp, this.state.windowWidth, this.state.windowHeight) //after the state has changed
+            }else{
+              draw(context, config, playerIndex, temp, 700, 700) //on the initial Drawing
+            }
+           
           }
         }
 
@@ -358,12 +395,12 @@ class Game extends Component {
         <div className={styles.center}>
           <div class={styles.ui_top} id="ui_play">
             <center>
-              
+
               <canvas ref="canvas"
                 width={this.state.windowWidth} height={this.state.windowHeight}
                 style={{ border: '1px solid black' }}
               />
-            
+
               {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
             </center>
           </div>
@@ -374,7 +411,7 @@ class Game extends Component {
         <div className={styles.center}>
           <div class={styles.ui_top} id="ui_play">
             <center>
-   
+
               <canvas ref="canvas"
                 width={700} height={700}
                 style={{ border: '1px solid black' }}
