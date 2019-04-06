@@ -77,7 +77,7 @@ class Stage {
 
 	/** Handle the mouse movement on the stage in canvas coordinates **/
 	mouseMovePlayer(x,y, playerIndex){
-		console.log('mouse Movement', playerIndex);
+		// console.log('mouse Movement', playerIndex);
 		if (this.actors[playerIndex].actorType == 'Tank'){
 			var canvasPosition=new Pair(x,y);
 			var worldPosition = this.mapCanvasToWorldPlayer(canvasPosition, playerIndex)
