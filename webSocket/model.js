@@ -77,9 +77,14 @@ class Stage {
 
 	/** Handle the mouse movement on the stage in canvas coordinates **/
 	mouseMovePlayer(x,y, playerIndex){
-		var canvasPosition=new Pair(x,y);
-		var worldPosition = this.mapCanvasToWorldPlayer(canvasPosition, playerIndex)
-		this.actors[playerIndex].pointTurret(worldPosition)
+		console.log('mouse Movement', playerIndex);
+		if (this.actors[playerIndex].actorType == 'Tank'){
+			var canvasPosition=new Pair(x,y);
+			var worldPosition = this.mapCanvasToWorldPlayer(canvasPosition, playerIndex)
+			this.actors[playerIndex].pointTurret(worldPosition)
+
+		}
+		
 	}
 
 	// Map an canvas coordinates to world coordinates
@@ -151,8 +156,14 @@ class Stage {
 		//@Todo
 		var b = new Tank(this, fixPosition, s.velocity, s.colour, s.radius);
 		b.assignId(id)
-		this.actors.splice(0,0,b)
-		this.playersID.splice(0,0,id)
+		var totalCurrentPlayers = (this.playersID.length)
+		var index = totalCurrentPlayers==-1? 0 : totalCurrentPlayers
+		this.actors.splice(index,0,b)
+		this.playersID.splice(index,0,id)
+		
+		console.log("Player Index", index);
+		
+		console.log('Player Ids:', this.playersID);
 		
 	}
 
@@ -164,6 +175,8 @@ class Stage {
 	}
 	
 	removePlayer(playerIndex){
+		console.log('Player Index being removed', playerIndex);
+		
 		this.actors.splice(playerIndex, 1)
 		this.playersID.splice(playerIndex, 1)
 	}
@@ -383,11 +396,25 @@ class Tank extends Actor {
 		this.id = 0
 		this.turtPosition = this.getTurretPosition()
 		this.dead = false
+		this.kills = 0
+		this.killedBy = ''
 	}
 
 	assignId(id){
 		this.id = id
 		// this.stage.playersID.push(this.id)
+	}
+
+	assignKiller(killer){
+		if (killer == this.id){
+			this.killedBy = 'selfKill'
+		}else {
+			this.killedBy = killer
+		}
+	}
+	
+	updateTotalKills() {
+		this.kills += 1
 	}
 	
 	setDead(val){
@@ -423,7 +450,7 @@ class Tank extends Actor {
 			// console.log("In the tanks ")
 			var bulletVelocity = this.turretDirection.sProd(5).vecAdd(this.velocity);
 			var bulletPosition = this.position.vecAdd(this.turretDirection.sProd(this.radius*2));;
-			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5);
+			var bullet = new Bullet(this.stage, bulletPosition, bulletVelocity, "#000000", this.radius/5, this.id);
 			this.stage.addBullets(bullet);
 			// console.log("step function is getting called and bullet is getting added to the stage");
 			// this.stage.addActor(bullet);
@@ -493,17 +520,32 @@ class Opponent extends Tank {
 }
 
 class Bullet extends Actor {
-	constructor(stage, position, velocity, colour, radius){
+	constructor(stage, position, velocity, colour, radius, owner){
 		super(stage, position, velocity, colour, radius);
 		this.lifetime = 200;
 		this.actorType = 'Bullet'
+		this.owner = owner
+		
+		console.log('New Bullet added owner:', this.owner);
+		
 	}
 
 	collide(other, newState){
 		this.makeZombie();
 		other.health--;
 
-		if(other.health<=0)other.makeZombie();
+		if(other.health<=0){
+			//other: the player that is colliding with the bullet
+			if (other.actorType == 'Tank' && other.killedBy == ''){
+				other.assignKiller(this.owner)
+				other.makeZombie();
+				var playerIndex = this.stage.playersID.indexOf(this.owner)
+				if (playerIndex != -1) {
+					this.stage.actors[playerIndex].updateTotalKills()
+				}
+			}
+			
+		}
 	}
 
 	step(){
