@@ -13,7 +13,8 @@ export function updateDatabase (data){
       data: check, // serializes the form's elements.
       success: function(){
         console.log('complete')
-      }
+      },
+      async: false
 	});
 
 }

@@ -5,7 +5,6 @@ import Game from './Game';
 import Profile from './Profile';
 import Stats from './Stats';
 import Instructions from './Instructions';
-import {updateDatabase} from './databaseFunc'
 
 
 class GameBoard extends Component {
@@ -13,7 +12,9 @@ class GameBoard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: "Stats"
+      view: "Stats",
+      data: {},
+      gameEnd: 0
     };
     this.changeView = this.changeView.bind(this);
   }
@@ -25,16 +26,20 @@ class GameBoard extends Component {
     }
     this.setState({
       view: viewSelect,
+      gameEnd: 0,
+      data: {}
     });
   }
   
   goToStats = (data) => {
     // console.log("hellofuckers");
     // updateDatabase(data)
-    console.log(data);
+    // console.log(data);
     
     this.setState({
       view: "Stats",
+      gameEnd: 1,
+      data: data
     });
   }
 
@@ -59,7 +64,10 @@ class GameBoard extends Component {
       return (
         <div className={styles.center}>
           <NavBar view={this.changeView.bind(this)} />
-          <Stats user={this.props.user} />
+          <Stats 
+            data={this.state.data} 
+            status={this.state.gameEnd}  
+            user={this.props.user} />
         </div>
       );
     }

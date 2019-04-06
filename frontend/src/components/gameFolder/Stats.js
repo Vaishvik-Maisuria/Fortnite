@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from '../App.css';
 import $ from 'jquery'
 import { throws } from 'assert';
+import {updateDatabase} from './databaseFunc'
 
 
 class Stats extends Component {
@@ -13,15 +14,23 @@ class Stats extends Component {
       check: false,
       player: null
     };
-
   }
+
+  // componentWillMount() {
+  //   const { data, status} = this.props
+  //   console.log(data, status);
+    
+  //   // if (status == 1){
+  //   //   updateDatabase(data)
+  //   // }
+  // }
   
   
   componentDidMount() {
       this.getProfile()
-      console.log('after ajax call');
       
   }
+
 
   getProfile = () => {
    $.ajax({
@@ -84,7 +93,7 @@ class Stats extends Component {
                 <tbody>
                     {this.state.players != null?
                       this.state.players.map((item, index) => {
-                        console.log('idnex:', index);
+
                         return(
                           <tr>
                             <td>{item.username}</td>

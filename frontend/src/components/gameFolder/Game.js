@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from '../App.css';
 import $ from 'jquery'
 import { draw, mouseMove, getMousePos } from './drawing'
+import { updateDatabase } from './databaseFunc'
 // import GameController from './GameController';
 // import WebSocket from 'ws'
 var moveMap2 = {
@@ -41,7 +42,8 @@ class Game extends Component {
         x: 0,
         y: 0
       },
-      totalKills: 0
+      totalKills: 0,
+      data: {}
     };
   }
 
@@ -51,14 +53,14 @@ class Game extends Component {
   };
 
   componentWillMount() {
-    // if (this.state.playerDead){
-    //   console.log('Dead Player');
-      
-    // }
+    
     window.addEventListener('resize', this.handleWindowSizeChange);
-    this.setState({
+    console.log('in component will Mount', this.state.playerDead);    
+      this.setState({
       socket: new WebSocket("ws://localhost:8001")
     })
+    
+    
   }
 
   componentWillUnmount() {
@@ -129,6 +131,8 @@ class Game extends Component {
   // }
 
   componentDidMount() {
+    console.log('Dead Player',this.state.playerDead);
+    
     if(this.state.playerDead){
       console.log('Player is deade');
       
@@ -258,6 +262,8 @@ class Game extends Component {
 
     this.state.socket.onmessage = function (event) {
       //when a message has been relased
+      console.log('Before checking event', this.state.playerDead);
+
       var item = JSON.parse(event.data)
 
       const config = item.data
@@ -281,16 +287,23 @@ class Game extends Component {
           console.log('Killed by: ', config[playerIndex].killedBy);
           console.log('Total Kills', config[playerIndex].kills);
           
+          var check = this.state
+          check['userName'] = this.props.user
+          check.totalKills = config[playerIndex].kills
+          updateDatabase(check)
+
+          // setTimeout(() => {
+          //   updateDatabase(check)
+          // })
           
           this.state.socket.close()
+
           console.log('Player is dead, Socket Closed');
           this.setState({
             playerDead: true,
-            totalKills: config[playerIndex].kills
+            totalKills: config[playerIndex].kills,
           })
-          var check = this.state
-          check['userName'] = this.props.user
-  
+
           this.props.goToStats(check)
 
         }else {
