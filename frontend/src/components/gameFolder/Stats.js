@@ -16,11 +16,11 @@ class Stats extends Component {
 
   }
   
+  
   componentDidMount() {
       this.getProfile()
       console.log('after ajax call');
       
-    
   }
 
   getProfile = () => {

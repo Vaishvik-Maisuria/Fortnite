@@ -5,6 +5,7 @@ import Game from './Game';
 import Profile from './Profile';
 import Stats from './Stats';
 import Instructions from './Instructions';
+import {updateDatabase} from './databaseFunc'
 
 
 class GameBoard extends Component {
@@ -27,8 +28,11 @@ class GameBoard extends Component {
     });
   }
   
-  goToStats = () => {
+  goToStats = (data) => {
     // console.log("hellofuckers");
+    // updateDatabase(data)
+    console.log(data);
+    
     this.setState({
       view: "Stats",
     });

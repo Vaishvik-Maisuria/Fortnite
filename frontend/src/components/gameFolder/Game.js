@@ -51,6 +51,10 @@ class Game extends Component {
   };
 
   componentWillMount() {
+    // if (this.state.playerDead){
+    //   console.log('Dead Player');
+      
+    // }
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
       socket: new WebSocket("ws://localhost:8001")
@@ -59,6 +63,8 @@ class Game extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowSizeChange);
+    // this.updateDatabase()
+
   }
   
   init = () => {
@@ -72,78 +78,64 @@ class Game extends Component {
   //   this.updateDatabase()
   // }
 
-  updateDatabase = () => {
-    var check = this.state
-    check['userName'] = this.props.user
-    console.log(check);
+  // updateDatabase = () => {
+  //   var check = this.state
+  //   check['userName'] = this.props.user
 
-    $.ajax({
-      method: "PUT",
-      url: "/api/user/addKills/user=" + this.props.user,
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      data: check,
-    }).done(function (data, text_status, jqXHR) {
-      console.log(text_status);
-      console.log(jqXHR.status);
-      console.log(data)
-
-      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-    }).fail(function (err) {
-      let response = {};
-      if ("responseJSON" in err) response = err.responseJSON;
-      else response = { error: { "Server Error": err.status } };
-      f(response, false);
-      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
-    });
-
-
-
-
-
-
-
-    $.ajax({
-			type: "PUT",
-			url: '/api/user/addKills/user=' + this.props.user,
-			contentType: "application/json",
-      data: check, // serializes the form's elements.
-      
-		}).done(function (data, text_status, jqXHR){
-        console.log();
-        
-    })
+  //   console.log(check);
+  //   console.log('Before updating score');
     
-    // $.ajax({
-		// 	method: "POST",
-		// 	url: "/api/user/addKills/",
-		// 	contentType: "application/json; charset=utf-8",
-		// 	dataType: "json",
-		// 	data: JSON.stringify(check)
-		// }).done(function (data, text_status, jqXHR) {
-		// 	console.log(text_status);
-		// 	console.log(jqXHR.status);
-		// 	// this.props.login();
-		// 	// showUI("#ui_login");
-		// 	/** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-		// }).fail(function (err) {
-    //   console.log('unsuccessfull');
-    //   console.log(err);
+  //   // $.ajax({
+  //   //   method: "PUT",
+  //   //   url: "/api/user/addKills/user=" + this.props.user,
+  //   //   contentType: "application/json; charset=utf-8",
+  //   //   dataType: "json",
+  //   //   data: check,
+  //   // }).done(function (data, text_status, jqXHR) {
+  //   //   console.log(text_status);
+  //   //   console.log(jqXHR.status);
+  //   //   console.log(data)
+
+  //   //   /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
+  //   // }).fail(function (err) {
+  //   //   let response = {};
+  //   //   if ("responseJSON" in err) response = err.responseJSON;
+  //   //   else response = { error: { "Server Error": err.status } };
+  //   //   f(response, false);
+  //   //   /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+  //   // });
+  //   $.ajax({
+	// 		type: "PUT",
+	// 		url: '/api/user/addKills/user=' + this.props.user,
+	// 		contentType: "application/json",
+  //     data: check, // serializes the form's elements.
+  //     success: function(){
+  //       console.log('complete')
+  //     }
+	// 	})
+
+
+  //   // $.ajax({
+	// 	// 	type: "PUT",
+	// 	// 	url: '/api/user/addKills/user=' + this.props.user,
+	// 	// 	contentType: "application/json",
+  //   //   data: check, // serializes the form's elements.
       
-		// 	// let response = {};
-		// 	// if ("responseJSON" in err) response = err.responseJSON;
-		// 	// else response = { error: { "Server Error": err.status } };
-		// 	// if ("db" in response.error && response.error.db == "SQLITE_CONSTRAINT: UNIQUE constraint failed: user.user") {
-		// 	// 	response.error.db = "user already taken";
-		// 	// }
-		// 	// showErrors("#ui_register",response);
-		// 	/** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
-		// });
-  }
+	// 	// }).done(function (data, text_status, jqXHR){
+  //   //     console.log("Success");
+
+  //   // })
+  
+  // }
 
   componentDidMount() {
     if(this.state.playerDead){
-      this.props.goToStats()
+      console.log('Player is deade');
+      
+      var check = this.state
+      check['userName'] = this.props.user
+  
+      this.props.goToStats(check)
     }
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext("2d");
@@ -283,7 +275,6 @@ class Game extends Component {
             type: 'deadPlayer',
             playerIndex: playerIndex
           }
-          console.log('Player Index', playerIndex);
           
           clearInterval(this.state.mouseInterval)
           this.sendData(data)
@@ -292,12 +283,15 @@ class Game extends Component {
           
           
           this.state.socket.close()
-          console.log('Player is dead');
+          console.log('Player is dead, Socket Closed');
           this.setState({
             playerDead: true,
             totalKills: config[playerIndex].kills
           })
-          this.props.goToStats()
+          var check = this.state
+          check['userName'] = this.props.user
+  
+          this.props.goToStats(check)
 
         }else {
           
