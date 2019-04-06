@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
 import $ from 'jquery'
-import { draw, mouseMove, getMousePos } from './drawing'
+import { draw, mouseMove, getMousePos, getTouchPos } from './drawing'
 // import GameController from './GameController';
 // import WebSocket from 'ws'
 var moveMap2 = {
@@ -161,19 +161,31 @@ class Game extends Component {
 
     var x = Math.round(accelerationIncludingGravity.x) / 2;
     var y = Math.round(accelerationIncludingGravity.y) / 2;
-    // var z = Math.round(accelerationIncludingGravity.z);
+    var z = Math.round(accelerationIncludingGravity.z) / 2;
 
     const keyPressData = {
       x: -x,
       y: y,
       id: this.state.id,
       playerIndex: this.state.playerIndex,
-      type: 'movement'
+      type: 'none'
     }
 
+
+    if( z > 7){
+      console.log("Gimma gimma never get dont you know your manners yet")
+      keyPressData.type = "pickup"
+    }else{
+      keyPressData.type = 'movement'
+    }
+     
+    this.setState({
+      mouseMovementData: keyPressData,
+    })
+    
     // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
     // console.log("Key is pressed");
-    this.sendData(keyPressData)
+    
     
     // console.log(x,y,z);
     // console.log(tiltFB);
@@ -182,47 +194,50 @@ class Game extends Component {
 
   handleTouchStart = (event) => {
     console.log('start');
+    const canvas = this.refs.canvas;
+    var mousePos = getTouchPos(canvas, event);
+    event.preventDefault();
+    const mouseMovementData = {
+      playerIndex: this.state.playerIndex,
+      id: this.state.id,
+      type: 'mouseClick',
+      x: mousePos.x,
+      y: mousePos.y
+    }
 
+    this.setState({
+      mouseMovementData: mouseMovementData,
+      player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
+    })
+
+    // mouseMovementData.type = 'mouseClick';
+    
+    this.sendData(mouseMovementData)
+      
+  }
+
+  handleTouchMove = (event) => {
+    console.log('move');
     event.preventDefault();
     let fingerx = event.touches[0].pageX;
     let fingery = event.touches[0].pageY;
     const mouseMovementData = {
       playerIndex: this.state.playerIndex,
       id: this.state.id,
-      type: 'mouseClick',
+      type: 'mouseMovement',
       x: fingerx,
       y: fingery
     }
-    
     this.setState({
       mouseMovementData: mouseMovementData,
-      player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
+      player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player)
     })
-
-    // this.sendData(mouseMovementData)
-  }
-
-  handleTouchMove = (event) => {
-    // console.log('move');
-    // event.preventDefault();
-    // let fingerx = event.touches[0].pageX;
-    // let fingery = event.touches[0].pageY;
-    // const mouseMovementData = {
-    //   playerIndex: this.state.playerIndex,
-    //   id: this.state.id,
-    //   type: 'mouseMovement',
-    //   x: fingerx,
-    //   y: fingery
-    // }
-    // this.setState({
-    //   mouseMovementData: mouseMovementData,
-    //   player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player)
-    // })
   }
 
   handleMouseClick = (event) => {
     const canvas = this.refs.canvas;
     var mousePos = getMousePos(canvas, event);
+
     const mouseMovementData = {
       playerIndex: this.state.playerIndex,
       id: this.state.id,
@@ -307,7 +322,7 @@ class Game extends Component {
         const playerIndex = ids.indexOf(id)
 
         if (config[playerIndex].dead) {
-          console.log("I  got Killed becuz i am a pussy ");
+        
 
           //Player is dead
           const data = {
@@ -350,13 +365,21 @@ class Game extends Component {
             }
             
           } else {
+
             //change the position
             //we only want the turretDirection
+
             var temp = config[playerIndex]
-            temp.turretDirection = this.state.player.turretDirection
+
+
+            if (!this.state.isMobile){
+              temp.turretDirection = this.state.player.turretDirection
+            }
+
+           
             // var temp = this.state.player
             // temp.position = config[playerIndex].position
-
+            console.log
             this.setState({
               player: temp
             })

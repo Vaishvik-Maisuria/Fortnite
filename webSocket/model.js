@@ -151,10 +151,10 @@ class Stage {
 		//Tank player object will have a id , and the playersID object in the stage
 		//will also keep that updated
 		let s = this.randomState();
-		var sampleColor = 'rgba(0,0,0,1)'
+		var sampleColor = 'rgba(255,0,0,1)'
 		var fixPosition = new Pair(250,250)
 		//@Todo
-		var b = new Tank(this, fixPosition, s.velocity, s.colour, s.radius);
+		var b = new Tank(this, fixPosition, s.velocity, sampleColor, s.radius);
 		b.assignId(id)
 		var totalCurrentPlayers = (this.playersID.length)
 		var index = totalCurrentPlayers==-1? 0 : totalCurrentPlayers

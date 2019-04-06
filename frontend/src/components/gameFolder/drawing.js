@@ -116,9 +116,11 @@ export function mapCanvasToWorld(canvasPosition, player, windowWidth, windowHeig
 
 /** Handle the mouse movement on the stage in canvas coordinates **/
 export function mouseMove(x,y, player, windowWidth, windowHeight ){
-    var canvasPosition=new Pair(x,y);
+	var canvasPosition=new Pair(x,y);
+	
     var worldPosition= mapCanvasToWorld(canvasPosition, player, windowWidth, windowHeight);
-    var updatedPlayer = pointTurret(worldPosition, player);
+	var updatedPlayer = pointTurret(worldPosition, player);
+	
     return updatedPlayer
 }
 
@@ -250,6 +252,14 @@ export function getMousePos(canvas, evt) {
     return {
         x: evt.clientX - rect.left,
         y: evt.clientY - rect.top
+    };
+}
+
+export function getTouchPos(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: event.touches[0].pageX - rect.left,
+        y: event.touches[0].pageY - rect.top
     };
 }
 
