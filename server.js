@@ -187,13 +187,27 @@ app.post('/api/user/:user', function (req, res) {
 
 // Update user
 app.put('/api/user/:user', function (req, res) {
-	var result = { error: validateUser(req.body), success: false };
+
+	let d = req.body;
+	// const k = Object.keys(d.checkedItems)
+	d.playafternoon = d.playingTime.playafternoon.checked
+	d.playmorning = d.playingTime.playmorning.checked
+	d.playevening = d.playingTime.playevening.checked
+	
+	console.log('Log', d);
+	
+
+	var result = { error: validateUser(d), success: false };
 	if (isEmptyObject(result["error"])) {
 		let sql = 'UPDATE user SET ' +
 			' password=?, skill=?, year=?, month=?, day=?, playmorning=?, playafternoon=?, playevening=? ' +
 			' WHERE user=? AND password=?;';
-		let d = req.body;
-		let params = [d.password, d.skill, d.year, d.month, d.day, d.playmorning, d.playafternoon, d.playevening, d.credentials.user, d.credentials.password];
+		let params = [
+			d.password, d.skill, 
+			d.year, d.month,
+			d.day, 
+			d.playmorning, d.playafternoon, d.playevening, 
+			d.user, d.password];
 
 		db.run(sql, params, function (err) {
 			if (err) {

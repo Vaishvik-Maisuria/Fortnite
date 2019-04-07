@@ -11,7 +11,8 @@ class Login extends Component {
     super(props);
     this.state = {
 			user     : "",
-			password : ""
+			password : "",
+			error: ""
 		};
 		this.api_login = this.api_login.bind(this);
 	}
@@ -39,12 +40,16 @@ class Login extends Component {
 			if("responseJSON" in err)response = err.responseJSON;
 			else response = { error: { "Server Error" : err.status } };
 			console.log(response);
-		
+			
+			this.setState({
+				error: 'Username or Password is incorrect'
+			})
 
-			this.setState((prevState, props) => ({
-				user: "",
-				password: ""
-			}));
+			// this.setState((prevState, props) => ({
+			// 	user: "",
+			// 	password: "",
+				
+			// }));
 		}.bind(this));
 	}
 
@@ -64,7 +69,18 @@ class Login extends Component {
 					</div>
 					<div className={styles.form_row}>
 						<input type="submit" id="loginSubmit" value="Login" onClick={this.api_login.bind(this)} />
+
+						<label
+							className=" red-text darken-1">
+							{this.state.error}
+						</label>
 					</div>
+
+					{/* <div>
+						<label
+						className=" red-text darken-1"
+						>{this.state.error}</label>
+					</div> */}
 
 					{/* <thead>
 						<div className="form-errors" colspan="2"></div>
