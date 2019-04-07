@@ -113,7 +113,8 @@ class Profile extends Component {
 			}
 			var errors = ['userTaken']
 			this.setState({
-				errors: errors
+				errors: errors,
+				success: ''
 			})
 			console.log(response.error.db);
 			
@@ -197,6 +198,11 @@ class Profile extends Component {
 
 			<div className="card">
 				<h2>Profile</h2>
+				<div className="container">
+					<label 
+					className="light-green accent-3"
+					style={{fontSize: '5em', fontWeight: 'bold'}} >
+					{this.state.success}</label>
 				<div className="card" style={{padding: '2%',  margin: '2%'}}>
           <form onSubmit={this.handleSubmit}>
 
@@ -352,6 +358,7 @@ class Profile extends Component {
 						</div>
 
           </form>
+				</div>
 				</div>
 			</div>
     );
