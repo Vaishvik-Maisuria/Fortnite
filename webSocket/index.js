@@ -107,6 +107,8 @@ wss.sendMapCoordinates = function() {
 
 		if(ws.readyState === ws.OPEN){
 			ws.send(check);
+		}else{
+			ws.close()
 		}
 	}
 	// const c = {...mainStage.actors, 'id': clientCounter}

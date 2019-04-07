@@ -64,9 +64,13 @@ class Game extends Component {
 
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
+    const socket = new WebSocket("ws://localhost:8001")
+    setTimeout(()=> {}, 1500)
+
     this.setState({
       // socket: new WebSocket("ws://localhost:8001")
-      socket: new WebSocket("ws://localhost:8001")
+      // socket: new WebSocket("ws://localhost:8001")
+      socket: socket
     })
   }
 
@@ -80,7 +84,7 @@ class Game extends Component {
     // console.log('Player Index', playerIndex);
     
     this.sendData(data)
-    setTimeout(() => {}, 2000)
+    // setTimeout(() => {}, 2000)
     // console.log('Killed by: ', config[playerIndex].killedBy);
     // console.log('Total Kills', config[playerIndex].kills);
    
@@ -89,12 +93,12 @@ class Game extends Component {
       playerDead: true,
       totalKills:0
     })
-    this.state.socket.close()
+    setTimeout(this.state.socket.close(), 3000)
+    // this.state.socket.close()
 
     console.log(this.state);
 
     this.updateDeathsDatabase();
-
   
     window.removeEventListener('resize', this.handleWindowSizeChange);
     window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
@@ -324,6 +328,7 @@ class Game extends Component {
       }
       // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
       // console.log("Key is pressed");
+      
       this.sendData(keyPressData)
     }
   }
@@ -435,16 +440,30 @@ class Game extends Component {
       }
     }.bind(this)
 
+    this.state.socket.onerror = function (event) {
+      console.log('There is an error');
+      this.state.socket.close()
+    }
+
+    this.state.socket.onclose = function (event) {
+
+    }
 
   }
 
   sendData = (data) => {
     // data.type = 'initialConnection'
-    console.log(this.state);
+    // console.log(this.state);
 
     // data['id'] = this.state.id
     const sData = JSON.stringify(data)
-    this.state.socket.send(sData)
+    try {
+      this.state.socket.send(sData)
+    } catch (error) {
+      console.log('Socket is already Closed');
+      this.state.socket.close()
+      
+    }
     
   }
 
