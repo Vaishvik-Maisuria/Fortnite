@@ -1,11 +1,5 @@
-// import {Pair}  from '../static-content/model'
-
-function randint(n){ return Math.round(Math.random()*n); }
-function rand(n){ return Math.random()*n; }
-
 // const safeJsonStringify = require('safe-json-stringify');
 var model = require('./model')
-var clientCounter = 0
 /*
 
 Basic Dataflow
@@ -43,7 +37,6 @@ The model will hold a seperate mapping of a player list,
 after the client sends their username, their player will be initialized
 added to the model , and a mapping to in the in this socket.
 */
-var counter = 0
 var mainStage = new model.Stage()
 
 /*
@@ -56,17 +49,9 @@ playerList is a list of actors
 		radius
 		isZombie
 		health
-
-		stateVars.concat["fire", "amunition", "pickup"];
-		turretDirection = new Pair(1,0);
-		fire = false; // whether we have to fire a bullet in the next step
-		pickup = false;
-		ammunition = 0;
-
 */
 
 //we have to use step instead
-
 var WebSocketServer = require('ws').Server
    ,wss = new WebSocketServer({port: 8001});
 
@@ -102,11 +87,12 @@ wss.sendMapCoordinates = function() {
 			id: 0,
 			data: mainStage.actors,
 		}
-		// console.log(finalc.id);
 		const check = JSON.stringify(finalc, getCircularReplacer())
 
 		if(ws.readyState === ws.OPEN){
 			ws.send(check);
+		}else{
+			ws.close()
 		}
 	}
 	// const c = {...mainStage.actors, 'id': clientCounter}
@@ -114,16 +100,6 @@ wss.sendMapCoordinates = function() {
 
 
 wss.on('connection', function(ws) {
-
-	//new Player needs to be added to the player list
-	// const playerIndex  = mainStage.addNewPlayer()
-	// mainStage.actors[playerIndex].assignId(ID()) //Each player has been assigned
-	// console.log("Player id", mainStage.actors[playerIndex].id );
-	
-	// wss.sendMapCoordinates()
-	
-	console.log("new Connection");
-	
 	ws.on('message', function(message) {
 		const data = JSON.parse(message)
 		handleClientAction(data, ws)
@@ -141,40 +117,27 @@ Possible Actions
 */
 
 function handleClientAction(data, ws){
-	// console.log(data);
 	
 	switch (data.type) {
 		case 'deadPlayer':
 			mainStage.removePlayer(data.playerIndex)
-			console.log('Player removed. totalPlayers', mainStage.actors.length);	
 			break
 		case 'userName':
-			//Data has the usernamem
-			// console.log("id Received :", data.id);
+			//Data has the username
 			mainStage.addNewPlayer(data.id)
-			
-			// console.log("Players Id",mainStage.playersID);
 			break
 		case 'pickup':
-			console.log("-------------------------------picking up");
 			// mainStage.player.setPickup(true);
-			mainStage.setPickUpPlayer(data.playerIndex)
-	
+			mainStage.setPickUpPlayer(data.playerIndex)	
 			break;
 		case 'movement':
-			// console.log('---------------------------- Key Movement');
 			//now we need to set the direction with a mainStage method
-			// mainStage.player.setDirection(data.x, data.y);
 			mainStage.setDirectionPlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseMovement':
-			// console.log('*--------------------------- Mouse Cursor Movement');
-			// mainStage.mouseMove(data.x, data.y);
 			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
 			break
 		case 'mouseClick':
-			console.log('---------------------------- Mouse Click');
-			// mainStage.mouseClick(data.x, data.y)
 			mainStage.mouseClickPLayer(data.x, data.y, data.playerIndex)
 			break
 		default:
