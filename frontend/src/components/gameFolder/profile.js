@@ -25,7 +25,8 @@ class Profile extends Component {
       playafternoon: false,
 			playevening: false,
 			playmorning: false,
-			errors:[]
+			errors:[],
+			success: ''
     };
   }
 
@@ -44,11 +45,12 @@ class Profile extends Component {
       console.log('Data',  data.data);
       
       var checks = this.state.playingTime
-  
+			var total = 0
       checks.playafternoon.checked =  data.data.playafternoon == 1? true : false
       checks.playmorning.checked =  data.data.playmorning == 1? true : false
       checks.playevening.checked =  data.data.playevening == 1? true : false
-      
+			
+			total = data.data.playafternoon + data.data.playmorning + data.data.playevening
 
       console.log('This is checks',checks);
       
@@ -63,7 +65,8 @@ class Profile extends Component {
         playingTime: checks,
         playmorning: data.data.playmorning,
         playafternoon: data.data.playafternoon,
-        playevening: data.data.playevening,
+				playevening: data.data.playevening,
+				totalPlaying: total
       });
 
 
@@ -79,29 +82,45 @@ class Profile extends Component {
   }
 
 
-  api_profile() {
-    let data = this.state;
-    let send = {"Username":data.userName, "Score":data.totalKills}
-    $.ajax({
-      method: "PUT",
-      url: "/api/user/" + data.user,
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      data: JSON.stringify(send)
-    }).done(function (data, text_status, jqXHR) {
-      console.log(text_status);
-      console.log(jqXHR.status);
-      f(data, true);
-
-      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-    }).fail(function (err) {
-      let response = {};
-      if ("responseJSON" in err) response = err.responseJSON;
-      else response = { error: { "Server Error": err.status } };
-      f(response, false);
-      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
-    });
-  }
+  api_register() {
+		let data = this.state;
+		console.log('Data', this.state);
+		// d.playmorning, d.playafternoon, d.playevening
+		const validation = this.typeValidation()
+		if (!validation) return
+		
+		$.ajax({
+			method: "PUT",
+			url: "/api/user/" + data.user,
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			data: JSON.stringify(data)
+		}).done(function (data, text_status, jqXHR) {
+			console.log(text_status);
+			console.log(jqXHR.status);
+			this.setState({
+				success: 'Updated Successfully'
+			})
+			// this.props.showlogin();
+			// showUI("#ui_login");
+			/** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
+		}.bind(this)).fail(function (err) {
+			let response = {};
+			if ("responseJSON" in err) response = err.responseJSON;
+			else response = { error: { "Server Error": err.status } };
+			if ("db" in response.error && response.error.db == "SQLITE_CONSTRAINT: UNIQUE constraint failed: user.user") {
+				response.error.db = "user already taken";
+			}
+			var errors = ['userTaken']
+			this.setState({
+				errors: errors
+			})
+			console.log(response.error.db);
+			
+			// showErrors("#ui_register",response);
+			/** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+		}.bind(this));
+	}
 
   componentDidMount() {
     this.getProfile(); 
@@ -111,7 +130,7 @@ class Profile extends Component {
     e.preventDefault()
     console.log('Submitted');
     
-		// this.api_register()
+		this.api_register()
 	}
 
 	handleChange = (e) => {
@@ -168,6 +187,8 @@ class Profile extends Component {
 
 	}
 
+
+
   render() {
 
     const { playingTime, errors } = this.state
@@ -183,7 +204,8 @@ class Profile extends Component {
               <label 
               className={(errors.includes('user') || errors.includes('userTaken'))? 'red-text darken-1' : ''} >
               User {errors.includes('userTaken')? '(Username Taken, Pick a different one)': ''}</label>
-              <input 
+							<input 
+							disabled={true}
               value={this.state.user}
               onChange={this.handleChange} 
               type="text" name="user" 
@@ -192,7 +214,8 @@ class Profile extends Component {
 
             <div  name="password">
 							<label className={errors.includes('password')? 'red-text darken-1' : ''}>Password</label>
-              <input 
+							<input 
+							disabled={true}
               value={this.state.password}
               onChange={this.handleChange} type="password" name="password" placeholder="Password" />
 						</div>
