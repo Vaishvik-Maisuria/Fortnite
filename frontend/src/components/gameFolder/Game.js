@@ -66,7 +66,7 @@ class Game extends Component {
     window.addEventListener('resize', this.handleWindowSizeChange);
     this.setState({
       // socket: new WebSocket("ws://localhost:8001")
-      socket: new WebSocket("ws://142.1.2.146:8001")
+      socket: new WebSocket("ws://localhost:8001")
     })
   }
 

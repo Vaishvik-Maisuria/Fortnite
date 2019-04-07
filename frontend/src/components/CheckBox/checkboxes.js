@@ -1,20 +1,44 @@
-const checkboxes = [
+export const checkboxes = [
     {
-      name: 'play morning\n',
+      name: 'playmorning',
       key: 'playMorning',
       value: 'yes',
+      checked: false
     },
     {
-      name: 'play afternoon',
+      name: 'playafternoon',
       key: 'playAfternoon',
       value: 'yes',
+      checked: false
     
     },
     {
-      name: 'play evening',
+      name: 'playevening',
       key: 'playEvening',
       value: 'yes',
+      checked: false
     },
   ];
-  
-  export default checkboxes;
+
+export const checkbox = {
+  playmorning: {
+    name: 'playmorning',
+    key: 'playMorning',
+    value: 'yes',
+    checked: false
+  },
+  playafternoon: {
+    name: 'playafternoon',
+    key: 'playAfternoon',
+    value: 'yes',
+    checked: false
+  },
+  playevening: {
+    name: 'playevening',
+    key: 'playEvening',
+    value: 'yes',
+    checked: false
+  }
+
+}
+  // export default checkboxes;

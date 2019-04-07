@@ -157,13 +157,29 @@ function validateUser(data){
 app.post('/api/user/:user', function (req, res) {
 // app.post('/api/user', function (req, res) {
 	console.log('adding in new user');
-	console.log(req.user,req.password,req.confirmpassword,req.skill,req.year,req.month,req.day + "\n\n");
-	var result = { error: validateUser(req.body) , success:false};
-	if(!isEmptyObject(result["error"])){
+	// console.log(req.user,req.password,req.confirmpassword,req.skill,req.year,req.month,req.day + "\n\n");
+	let d = req.body;
+	const k = Object.keys(d.checkedItems)
+	d.playafternoon = d.playingTime.playafternoon.checked
+	d.playmorning = d.playingTime.playmorning.checked
+	d.playevening = d.playingTime.playevening.checked
+	
+	console.log(d);
+
+	// d['playmorning'] = 'playmorning' in d.checkedItems? true : false
+	// d['playafternoon'] = 'playafternoon' in d.checkedItems? true : false
+	// d['playevening'] = 'playevening' in d.checkedItems? true : false
+	
+	var result = { error: validateUser(d) , success:false};
+	console.log(result);
+	
+	if(isEmptyObject(result["error"])){
 		let sql = 'INSERT INTO user '+
 			'(user, password, skill, year, month, day, playmorning, playafternoon, playevening) ' +
 			' VALUES(?,?,?,?,?,?,?,?,?);';
 		let d = req.body;
+		console.log(d);
+		
 		let params = [d.user, d.password, d.skill, d.year, d.month, d.day, d.playmorning, d.playafternoon, d.playevening];
 
 		db.run(sql, params, function (err){
