@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
 import styles2 from '../loginAndRegistration/loginAndRegistration.css'
-import {checkbox, Checkbox} from '../CheckBox/checkboxes'
+import {checkbox} from '../CheckBox/checkboxes'
+
+import Checkbox from '../CheckBox/Checkbox';
+
 import $ from 'jquery'
 
 
@@ -38,10 +41,16 @@ class Profile extends Component {
     }).done(function (data, text_status, jqXHR) {
       // console.log(text_status);
       // console.log(jqXHR.status);
-      var checks = this.stata.playingTime
-      checks.playafternoon =  data.data.playafternoon == 1? true : false
-      checks.playmorning =  data.data.playmorning == 1? true : false
-      checks.playevening =  data.data.playevening == 1? true : false
+      console.log('Data',  data.data);
+      
+      var checks = this.state.playingTime
+  
+      checks.playafternoon.checked =  data.data.playafternoon == 1? true : false
+      checks.playmorning.checked =  data.data.playmorning == 1? true : false
+      checks.playevening.checked =  data.data.playevening == 1? true : false
+      
+
+      console.log('This is checks',checks);
       
       this.setState({
         user: data.data.user,
@@ -51,10 +60,10 @@ class Profile extends Component {
         year: data.data.year,
         month: data.data.month,
         day: data.data.day,
+        playingTime: checks,
         playmorning: data.data.playmorning,
         playafternoon: data.data.playafternoon,
         playevening: data.data.playevening,
-        playingTime: checks
       });
 
 
@@ -137,8 +146,8 @@ class Profile extends Component {
 
   render() {
 
-    const {playingTime, errors} = this.state
-    console.log(this.state);
+    const { playingTime, errors } = this.state
+    
     return (
 
 			<div className="card">
@@ -274,24 +283,24 @@ class Profile extends Component {
 							>I plan to play:</label>
 							{
 								Object.keys(playingTime).map(item => {
-                  console.log(item)
-                  
+                  // console.log(item)
                   return (
-									<Checkbox 
-										name={playingTime[item].name} 
-										checked={playingTime[item].checked}
-										onChange={this.handleChangecheck} 
-									/>
+                    <Checkbox 
+                      name={playingTime[item].name} 
+                      checked={playingTime[item].checked}
+                      onChange={this.handleChangecheck} 
+                    />
                   )
                 })
 							}
 						</div>
+
             <div >
 							<input 
 							className="waves-effect blue btn-small"
 							type="submit" 
 							id="registerSubmit" 
-							value="Register" 
+							value="Update" 
 							 />
 						</div>
 
