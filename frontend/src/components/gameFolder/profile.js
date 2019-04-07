@@ -60,12 +60,13 @@ class Profile extends Component {
 
   api_profile() {
     let data = this.state;
+    let send = {"Username":data.userName, "Score":data.totalKills}
     $.ajax({
       method: "PUT",
       url: "/api/user/" + data.user,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
-      data: JSON.stringify(data)
+      data: JSON.stringify(send)
     }).done(function (data, text_status, jqXHR) {
       console.log(text_status);
       console.log(jqXHR.status);

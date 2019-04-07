@@ -76,41 +76,29 @@ class Game extends Component {
   }
 
 
-  updateDatabase = () => {
-    var check = this.state
-    check['userName'] = this.props.user
-    console.log(check);
 
+
+
+  updateDatabase = () => {
+    
+    let send = {"Username":this.props.user, "Score":this.state.totalKills}
+    
     $.ajax({
       method: "PUT",
-      url: "/api/user/addKills/user=" + this.props.user,
+      url: "/api/addKills/user=" + this.props.user,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
-      data: check,
+      data: JSON.stringify(send),
     }).done(function (data, text_status, jqXHR) {
-      console.log(text_status);
-      console.log(jqXHR.status);
-      console.log(data)
+      
 
-      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
     }).fail(function (err) {
       let response = {};
       if ("responseJSON" in err) response = err.responseJSON;
       else response = { error: { "Server Error": err.status } };
-      f(response, false);
-      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
+     
     });
 
-    $.ajax({
-      type: "PUT",
-      url: '/api/user/addKills/user=' + this.props.user,
-      contentType: "application/json",
-      data: check, // serializes the form's elements.
-
-    }).done(function (data, text_status, jqXHR) {
-      console.log();
-
-    })
   }
 
   componentDidMount() {
@@ -173,7 +161,7 @@ class Game extends Component {
 
 
     if( z > 7){
-      console.log("Gimma gimma never get dont you know your manners yet")
+      // console.log("Gimma gimma never get dont you know your manners yet")
       keyPressData.type = "pickup"
     }else{
       keyPressData.type = 'movement'
@@ -217,7 +205,7 @@ class Game extends Component {
   }
 
   handleTouchMove = (event) => {
-    console.log('move');
+    // console.log('move');
     event.preventDefault();
     let fingerx = event.touches[0].pageX;
     let fingery = event.touches[0].pageY;
@@ -273,7 +261,7 @@ class Game extends Component {
 
   handleKeyPress = (event) => {
     var key = event.key;
-    console.log(this.state.id);
+    // console.log(this.state.id);
    
     if (key in moveMap2) {
       const keyPressData = {
@@ -329,28 +317,34 @@ class Game extends Component {
             type: 'deadPlayer',
             playerIndex: playerIndex
           }
-          console.log('Player Index', playerIndex);
+          // console.log('Player Index', playerIndex);
 
           clearInterval(this.state.mouseInterval)
           this.sendData(data)
-          console.log('Killed by: ', config[playerIndex].killedBy);
-          console.log('Total Kills', config[playerIndex].kills);
+          // console.log('Killed by: ', config[playerIndex].killedBy);
+          // console.log('Total Kills', config[playerIndex].kills);
 
 
           this.state.socket.close()
-          console.log('Player is dead');
+
+          // console.log('Player is dead');
+
+         
           this.setState({
             playerDead: true,
             totalKills: config[playerIndex].kills
           })
+
+          this.updateDatabase();
+
           this.props.goToStats()
 
         } else {
 
           if (this.state.playerIndex != playerIndex || this.state.player == null) {
             //assign the new player
-            console.log('local playerINdex', this.state.playerIndex);
-            console.log(playerIndex);
+            // console.log('local playerINdex', this.state.playerIndex);
+            // console.log(playerIndex);
 
 
             this.setState({
