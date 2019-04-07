@@ -196,7 +196,7 @@ class Profile extends Component {
     return (
 
 			<div className="card">
-				<h2>Register</h2>
+				<h2>Profile</h2>
 				<div className="card" style={{padding: '2%',  margin: '2%'}}>
           <form onSubmit={this.handleSubmit}>
 
