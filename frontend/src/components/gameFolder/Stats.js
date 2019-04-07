@@ -18,6 +18,7 @@ class Stats extends Component {
   
   componentDidMount() {
       this.getProfile()
+      console.log(this.state)
       console.log('after ajax call');
       
     
@@ -28,7 +29,6 @@ class Stats extends Component {
       method: "GET",
       url: "/api/users/",
     }).done(function (data, text_status, jqXHR) {
-      
       var userProfile = null
       for (var i = 0; i < data.data.length; i ++){
         if (data.data[i].username == this.props.user){
@@ -36,14 +36,11 @@ class Stats extends Component {
           break
         }
       }
-
       this.setState({
         players: data.data,
         player: userProfile
       })
-
- 
-      console.log('log data ',data.data);
+      // console.log('log data ',data.data);
       /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
     }.bind(this)).fail(function (err) {
       let response = {};
@@ -64,12 +61,12 @@ class Stats extends Component {
 
             <div className=" deep-purple darken-3 card-panel" style={{margin: '5%', height:'25%'}}>
               {this.state.player!=null? 
-                <h2 className="white-text text-darken-3">{this.state.player.wins + '/' + this.state.player.loses}</h2>
+                <h2 className="white-text text-darken-3">{this.state.player.kills + '/' + this.state.player.deaths}</h2>
                 :
                 null
               }
              
-              <text className="white-text">WIN/LOSE Ratio</text>
+              <text className="white-text">Kills/Deaths Ratio</text>
             </div>
 
             <h2>Scoreboard</h2>
@@ -84,11 +81,11 @@ class Stats extends Component {
                 <tbody>
                     {this.state.players != null?
                       this.state.players.map((item, index) => {
-                        console.log('idnex:', index);
+                        console.log('idnex:', item);
                         return(
                           <tr>
                             <td>{item.username}</td>
-                            <td>{item.wins + '/' + item.loses}</td>
+                            <td>{item.kills + '/' + item.deaths}</td>
                           </tr>
                         )
                       })
