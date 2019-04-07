@@ -202,11 +202,9 @@ app.put('/api/user/:user', function (req, res) {
 
 
 // update the kills
-
 app.put('/api/addKills/:user', function (req, res) {
 	var result = { error: {}, success: false };
-	console.log(req.body);
-
+	
 	if (isEmptyObject(result["error"])) {
 		let sql = 'UPDATE score SET kills=(Select kills from score where username=?) + ? where username=?;';
 		let d = req.body;
@@ -222,25 +220,39 @@ app.put('/api/addKills/:user', function (req, res) {
 					result["error"]["db"] = "Not updated";
 					res.status(404);
 				} else {
-					let sql = 'UPDATE score SET deaths=(Select deaths from score where username=?) + ? where username=?;';
-					let params = [d.Username, d.Score, d.Username];
-					db.run(sql, params, function (err) {
-						if (err) {
-							res.status(500);
-							result["error"]["db"] = err.message;
-						} else {
-							if (this.changes != 1) {
-								result["error"]["db"] = "Not updated";
-								res.status(404);
-							} else {
-								res.status(200);
-								result.success = true;
-							}
-						}
-					});
+					res.status(200);
+					result.success = true;
 				}
 			}
 			res.json(result);
+		});
+	} else {
+		res.status(400);
+		res.json(result);
+	}
+});
+
+// update the deaths
+app.put('/api/addDeath/:user', function (req, res) {
+	var result = { error: {}, success: false };
+	if (isEmptyObject(result["error"])) {
+		let sql = 'UPDATE score SET deaths=(Select deaths from score where username=?) + ? where username=?;';
+		let d = req.body;
+		let params = [d.Username, 1, d.Username];
+
+		db.run(sql, params, function (err) {
+			if (err) {
+				res.status(500);
+				result["error"]["db"] = err.message;
+			} else {
+				if (this.changes != 1) {
+					result["error"]["db"] = "Not updated";
+					res.status(404);
+				} else {
+					res.status(200);
+					result.success = true;
+				}
+			}
 		});
 	} else {
 		res.status(400);
