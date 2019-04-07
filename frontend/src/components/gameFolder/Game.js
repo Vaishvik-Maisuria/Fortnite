@@ -71,21 +71,66 @@ class Game extends Component {
   }
 
   componentWillUnmount() {
+    clearInterval(this.state.mouseInterval)
+     //Player is dead
+    const data = {
+      type: 'deadPlayer',
+      playerIndex: this.state.playerIndex
+    }
+    // console.log('Player Index', playerIndex);
+    
+    this.sendData(data)
+    setTimeout(() => {}, 2000)
+    // console.log('Killed by: ', config[playerIndex].killedBy);
+    // console.log('Total Kills', config[playerIndex].kills);
+   
+    clearInterval(this.state.mouseInterval)
+    this.setState({
+      playerDead: true,
+      totalKills:0
+    })
+    this.state.socket.close()
+
+    console.log(this.state);
+
+    this.updateDeathsDatabase();
+
+  
     window.removeEventListener('resize', this.handleWindowSizeChange);
     window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
+
+    
   }
 
-
-
-
-
-  updateDatabase = () => {
+  updateKillsDatabase = () => {
     
     let send = {"Username":this.props.user, "Score":this.state.totalKills}
     
     $.ajax({
       method: "PUT",
       url: "/api/addKills/user=" + this.props.user,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify(send),
+    }).done(function (data, text_status, jqXHR) {
+      
+
+    }).fail(function (err) {
+      let response = {};
+      if ("responseJSON" in err) response = err.responseJSON;
+      else response = { error: { "Server Error": err.status } };
+     
+    });
+
+  }
+
+  updateDeathsDatabase = () => {
+    
+    let send = {"Username":this.props.user, "Score":0}
+    
+    $.ajax({
+      method: "PUT",
+      url: "/api/addDeath/user=" + this.props.user,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify(send),
@@ -250,7 +295,7 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-    // console.log(mouseMovementData);
+    console.log(mouseMovementData);
     this.setState({
       mouseMovementData: mouseMovementData,
       player: mouseMove(mousePos.x, mousePos.y, this.state.player, 700, 700)
@@ -328,14 +373,14 @@ class Game extends Component {
           this.state.socket.close()
 
           // console.log('Player is dead');
-
-         
           this.setState({
             playerDead: true,
             totalKills: config[playerIndex].kills
           })
-
-          this.updateDatabase();
+          
+          console.log(this.state);
+          
+          this.updateKillsDatabase();
 
           this.props.goToStats()
 
@@ -344,7 +389,7 @@ class Game extends Component {
           if (this.state.playerIndex != playerIndex || this.state.player == null) {
             //assign the new player
             // console.log('local playerINdex', this.state.playerIndex);
-            // console.log(playerIndex);
+            console.log(playerIndex);
 
 
             this.setState({
@@ -395,11 +440,12 @@ class Game extends Component {
 
   sendData = (data) => {
     // data.type = 'initialConnection'
-    // console.log();
+    console.log(this.state);
 
     // data['id'] = this.state.id
     const sData = JSON.stringify(data)
     this.state.socket.send(sData)
+    
   }
 
 

@@ -81,7 +81,7 @@ class Stats extends Component {
                 <tbody>
                     {this.state.players != null?
                       this.state.players.map((item, index) => {
-                        console.log('idnex:', item);
+                        // console.log('idnex:', item);
                         return(
                           <tr>
                             <td>{item.username}</td>
