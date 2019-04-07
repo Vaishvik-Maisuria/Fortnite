@@ -64,10 +64,13 @@ class Game extends Component {
 
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
+
     this.setState({
       // socket: new WebSocket("ws://localhost:8001")
-      socket: new WebSocket("ws://localhost:8001")
+      socket: new WebSocket("ws://142.1.2.146:8001")
     })
+    
+    
   }
 
   componentWillUnmount() {
@@ -79,7 +82,7 @@ class Game extends Component {
     }
     // console.log('Player Index', playerIndex);
     
-    this.sendData(data)
+    // this.sendData(data)
     setTimeout(() => {}, 2000)
     // console.log('Killed by: ', config[playerIndex].killedBy);
     // console.log('Total Kills', config[playerIndex].kills);
@@ -89,7 +92,7 @@ class Game extends Component {
       playerDead: true,
       totalKills:0
     })
-    this.state.socket.close()
+    // this.state.socket.close()
 
     console.log(this.state);
 
@@ -324,6 +327,7 @@ class Game extends Component {
       }
       // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
       // console.log("Key is pressed");
+
       this.sendData(keyPressData)
     }
   }
