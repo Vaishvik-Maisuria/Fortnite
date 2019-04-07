@@ -25,7 +25,9 @@ class Game extends Component {
       windowWidth: window.screen.availWidth - 22,
       isMobile: false,
       socket: null,
+      socketOpen: false,
       id: ID(),
+      hasError: false,
       acceleration: {
         x: 0,
         y: 0,
@@ -62,50 +64,50 @@ class Game extends Component {
     this.setState({ width: window.innerWidth });
   };
 
+  componentDidCatch(error, info) {
+    this.setState({ hasError: true });
+  }
+
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
+    const socket = new WebSocket("ws://localhost:8001")
+    setTimeout(() => { }, 1500)
+
     this.setState({
-      // socket: new WebSocket("ws://localhost:8001")
-      socket: new WebSocket("ws://localhost:8001")
+      socket: socket
     })
   }
 
   componentWillUnmount() {
     clearInterval(this.state.mouseInterval)
-     //Player is dead
+    //Player is dead
     const data = {
       type: 'deadPlayer',
       playerIndex: this.state.playerIndex
     }
-    // console.log('Player Index', playerIndex);
-    
+
     this.sendData(data)
-    setTimeout(() => {}, 2000)
-    // console.log('Killed by: ', config[playerIndex].killedBy);
-    // console.log('Total Kills', config[playerIndex].kills);
-   
+
     clearInterval(this.state.mouseInterval)
     this.setState({
       playerDead: true,
-      totalKills:0
+      totalKills: 0
     })
-    this.state.socket.close()
-
-    console.log(this.state);
+    
+    setTimeout(this.state.socket.close(), 3000)
 
     this.updateDeathsDatabase();
 
-  
     window.removeEventListener('resize', this.handleWindowSizeChange);
     window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
 
-    
+
   }
 
   updateKillsDatabase = () => {
-    
-    let send = {"Username":this.props.user, "Score":this.state.totalKills}
-    
+
+    let send = { "Username": this.props.user, "Score": this.state.totalKills }
+
     $.ajax({
       method: "PUT",
       url: "/api/addKills/user=" + this.props.user,
@@ -113,21 +115,17 @@ class Game extends Component {
       dataType: "json",
       data: JSON.stringify(send),
     }).done(function (data, text_status, jqXHR) {
-      
+
 
     }).fail(function (err) {
       let response = {};
       if ("responseJSON" in err) response = err.responseJSON;
       else response = { error: { "Server Error": err.status } };
-     
     });
-
   }
 
   updateDeathsDatabase = () => {
-    
-    let send = {"Username":this.props.user, "Score":0}
-    
+    let send = { "Username": this.props.user, "Score": 0 }
     $.ajax({
       method: "PUT",
       url: "/api/addDeath/user=" + this.props.user,
@@ -135,27 +133,20 @@ class Game extends Component {
       dataType: "json",
       data: JSON.stringify(send),
     }).done(function (data, text_status, jqXHR) {
-      
-
+      // do nothing
     }).fail(function (err) {
       let response = {};
       if ("responseJSON" in err) response = err.responseJSON;
       else response = { error: { "Server Error": err.status } };
-     
     });
-
   }
 
   componentDidMount() {
-    if (this.state.width <= 500){
+    if (this.state.width <= 500) {
       this.setState({
         isMobile: true
       })
     };
-    // this.setState({
-    //   windowHeight:window.screen.availHeight - 155,
-    //   windowWidth: window.screen.availWidth - 22,
-    // })
 
     if (this.state.playerDead) {
       this.props.goToStats()
@@ -168,14 +159,12 @@ class Game extends Component {
     canvas.addEventListener("click", this.handleMouseClick);
     canvas.addEventListener("mousemove", this.handleMouseMovement);
 
-
     // // touch listensers 
     canvas.addEventListener('touchmove', this.handleTouchMove)
     canvas.addEventListener('touchstart', this.handleTouchStart);
 
     // device motion 
     window.addEventListener('devicemotion', this.handleDeviceMotion, true);
-
 
     var intVal = setInterval(() => {
       this.sendData(this.state.mouseMovementData)
@@ -189,13 +178,11 @@ class Game extends Component {
 
   handleDeviceMotion = event => {
     const { acceleration, accelerationIncludingGravity, interval, rotationRate } = event;
-    this.setState({ acceleration, accelerationIncludingGravity, interval, rotationRate });
-
+    this.setState({ acceleration, accelerationIncludingGravity, interval, rotationRate })
 
     var x = Math.round(accelerationIncludingGravity.x) / 2;
     var y = Math.round(accelerationIncludingGravity.y) / 2;
-    var z = Math.round(accelerationIncludingGravity.z) / 2;
-
+    var z = Math.round(accelerationIncludingGravity.z);
     const keyPressData = {
       x: -x,
       y: y,
@@ -203,30 +190,18 @@ class Game extends Component {
       playerIndex: this.state.playerIndex,
       type: 'none'
     }
-
-
-    if( z > 7){
-      // console.log("Gimma gimma never get dont you know your manners yet")
+    if (z > 7) {
       keyPressData.type = "pickup"
-    }else{
+    } else {
       keyPressData.type = 'movement'
     }
-     
     this.setState({
       mouseMovementData: keyPressData,
     })
-    
-    // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
-    // console.log("Key is pressed");
-    
-    
-    // console.log(x,y,z);
-    // console.log(tiltFB);
   };
 
 
   handleTouchStart = (event) => {
-    console.log('start');
     const canvas = this.refs.canvas;
     var mousePos = getTouchPos(canvas, event);
     event.preventDefault();
@@ -237,20 +212,14 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-
     this.setState({
       mouseMovementData: mouseMovementData,
       player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
     })
-
-    // mouseMovementData.type = 'mouseClick';
-    
     this.sendData(mouseMovementData)
-      
   }
 
   handleTouchMove = (event) => {
-    // console.log('move');
     event.preventDefault();
     let fingerx = event.touches[0].pageX;
     let fingery = event.touches[0].pageY;
@@ -278,10 +247,7 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-    // console.log('mouse clicked');
-
     this.sendData(mouseMovementData)
-
   }
 
   handleMouseMovement = (event) => {
@@ -295,19 +261,14 @@ class Game extends Component {
       x: mousePos.x,
       y: mousePos.y
     }
-    console.log(mouseMovementData);
     this.setState({
       mouseMovementData: mouseMovementData,
       player: mouseMove(mousePos.x, mousePos.y, this.state.player, 700, 700)
     })
-    // console.log("Mouse moving");
-
   }
 
   handleKeyPress = (event) => {
     var key = event.key;
-    // console.log(this.state.id);
-   
     if (key in moveMap2) {
       const keyPressData = {
         x: moveMap2[key][0],
@@ -322,23 +283,25 @@ class Game extends Component {
       } else {
         keyPressData.type = 'movement'
       }
-      // stage.player.setDirection(moveMap[key].dx, moveMap[key].dy);
-      // console.log("Key is pressed");
+     
       this.sendData(keyPressData)
     }
   }
 
   initializeSocketOperations = (canvas) => {
     this.state.socket.onopen = function (event) {
-
       const data = {
         type: 'userName',
         id: this.state.id
+        
       }
+      this.setState({
+        socketOpen: true
+      })
       this.sendData(data)
-
-      console.log("connected");
     }.bind(this);
+
+
 
     this.state.socket.onmessage = function (event) {
       //when a message has been relased
@@ -355,100 +318,83 @@ class Game extends Component {
         const playerIndex = ids.indexOf(id)
 
         if (config[playerIndex].dead) {
-        
-
           //Player is dead
           const data = {
             type: 'deadPlayer',
             playerIndex: playerIndex
           }
-          // console.log('Player Index', playerIndex);
-
+          // clear the interval
           clearInterval(this.state.mouseInterval)
+
           this.sendData(data)
-          // console.log('Killed by: ', config[playerIndex].killedBy);
-          // console.log('Total Kills', config[playerIndex].kills);
 
-
+          // this closes the socket 
           this.state.socket.close()
 
-          // console.log('Player is dead');
           this.setState({
             playerDead: true,
             totalKills: config[playerIndex].kills
           })
-          
-          console.log(this.state);
-          
+
           this.updateKillsDatabase();
-
           this.props.goToStats()
-
         } else {
-
           if (this.state.playerIndex != playerIndex || this.state.player == null) {
             //assign the new player
-            // console.log('local playerINdex', this.state.playerIndex);
-            console.log(playerIndex);
-
-
             this.setState({
               player: config[playerIndex],
               playerIndex: playerIndex
             })
-            // console.log('#-----------------', config[playerIndex]);
-            if (this.state.isMobile){
+
+            if (this.state.isMobile) {
               draw(context, config, playerIndex, config[playerIndex], this.state.windowWidth, this.state.windowHeight) //on the initial Drawing
-            }else{
+            } else {
               draw(context, config, playerIndex, config[playerIndex], 700, 700) //on the initial Drawing
             }
-            
           } else {
-
             //change the position
             //we only want the turretDirection
-
             var temp = config[playerIndex]
 
-
-            if (!this.state.isMobile){
+            if (!this.state.isMobile) {
               temp.turretDirection = this.state.player.turretDirection
             }
-
-           
-            // var temp = this.state.player
-            // temp.position = config[playerIndex].position
-            console.log
             this.setState({
               player: temp
             })
             //player has been assigned
-            if (this.state.isMobile){
+            if (this.state.isMobile) {
               draw(context, config, playerIndex, temp, this.state.windowWidth, this.state.windowHeight) //after the state has changed
-            }else{
+            } else {
               draw(context, config, playerIndex, temp, 700, 700) //on the initial Drawing
             }
-           
+
           }
         }
 
       }
+    }.bind(this);
+    this.state.socket.onerror = function (event) {
+      this.state.socket.close()
+    }
+    this.state.socket.onclose = function (event) {
+      console.log("Socket should be closed")
+      this.setState({
+        socketOpen: false
+      })
+
     }.bind(this)
-
-
   }
 
   sendData = (data) => {
-    // data.type = 'initialConnection'
-    console.log(this.state);
-
-    // data['id'] = this.state.id
     const sData = JSON.stringify(data)
-    this.state.socket.send(sData)
-    
+    if (this.state.socketOpen){
+      this.state.socket.send(sData)
+    }
+      // this.state.socket.onopen = function (event) {
+      
+
   }
-
-
   render() {
     const { width } = this.state;
     const isMobile = width <= 500;
@@ -458,13 +404,10 @@ class Game extends Component {
         <div className={styles.center}>
           <div class={styles.ui_top} id="ui_play">
             <center>
-
               <canvas ref="canvas"
                 width={this.state.windowWidth} height={this.state.windowHeight}
                 style={{ border: '1px solid black' }}
               />
-
-              {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
             </center>
           </div>
         </div>
@@ -474,13 +417,10 @@ class Game extends Component {
         <div className={styles.center}>
           <div class={styles.ui_top} id="ui_play">
             <center>
-
               <canvas ref="canvas"
                 width={700} height={700}
                 style={{ border: '1px solid black' }}
               />
-
-              {/* <canvas id="stage" width="700" height="700" style="border:1px solid black;"> </canvas> */}
             </center>
           </div>
         </div>
