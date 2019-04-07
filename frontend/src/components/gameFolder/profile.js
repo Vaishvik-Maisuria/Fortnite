@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../App.css';
 import styles2 from '../loginAndRegistration/loginAndRegistration.css'
+import {checkbox, Checkbox} from '../CheckBox/checkboxes'
 import $ from 'jquery'
 
 
@@ -16,13 +17,18 @@ class Profile extends Component {
       year: "",
       month: "",
       day: "",
-      playmorning: "yes",
-      playafternoon: "",
-      playevening: ""
+      playingTime: checkbox,
+			totalPlaying: 0,
+      playafternoon: false,
+			playevening: false,
+			playmorning: false,
+			errors:[]
     };
   }
 
   getProfile() {
+    console.log('user', this.props.user);
+    
 
     $.ajax({
       method: "GET",
@@ -32,6 +38,11 @@ class Profile extends Component {
     }).done(function (data, text_status, jqXHR) {
       // console.log(text_status);
       // console.log(jqXHR.status);
+      var checks = this.stata.playingTime
+      checks.playafternoon =  data.data.playafternoon == 1? true : false
+      checks.playmorning =  data.data.playmorning == 1? true : false
+      checks.playevening =  data.data.playevening == 1? true : false
+      
       this.setState({
         user: data.data.user,
         password: data.data.password,
@@ -42,7 +53,8 @@ class Profile extends Component {
         day: data.data.day,
         playmorning: data.data.playmorning,
         playafternoon: data.data.playafternoon,
-        playevening: data.data.playevening
+        playevening: data.data.playevening,
+        playingTime: checks
       });
 
 
@@ -58,92 +70,234 @@ class Profile extends Component {
   }
 
 
-  api_profile() {
-    let data = this.state;
-    $.ajax({
-      method: "PUT",
-      url: "/api/user/" + data.user,
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      data: JSON.stringify(data)
-    }).done(function (data, text_status, jqXHR) {
-      console.log(text_status);
-      console.log(jqXHR.status);
-      f(data, true);
-
-      /** console.log(JSON.stringify(data)); console.log(text_status); console.log(jqXHR.status); **/
-    }).fail(function (err) {
-      let response = {};
-      if ("responseJSON" in err) response = err.responseJSON;
-      else response = { error: { "Server Error": err.status } };
-      f(response, false);
-      /** console.log(err.status); console.log(JSON.stringify(err.responseJSON)); **/
-    });
-  }
-
   componentDidMount() {
     this.getProfile(); 
   }
 
-  render() {
+  handleSubmit = (e) => {
+    e.preventDefault()
+    console.log('Submitted');
     
-    console.log(this.state.user);
+		// this.api_register()
+	}
+
+	handleChange = (e) => {
+		this.setState({
+			[e.target.name]: e.target.value
+		})
+		console.log(e.target.value);
+		
+  }
+  
+  handleChangecheck = (e) => {
+		const item = e.target.name;
+		const isChecked = e.target.checked;
+		
+		const playTime = this.state.playingTime
+		console.log(playTime);
+		const strup = item.replace('/n', '')
+		console.log(strup);
+		
+		playTime[strup].checked = e.target.checked
+		if (e.target.checked){
+			this.state.totalPlaying += 1
+		}else {
+			this.state.totalPlaying -= 1
+
+		}
+		
+		this.setState({
+			playingTime: playTime
+		})
+
+	}
+	
+	typeValidation =() => {
+		var errors = []
+		const keys = Object.keys(this.state)
+		if (this.state.user === '') errors.push('user')
+		if (this.state.password === '') errors.push('password')
+		if (this.state.confirmpassword === '') errors.push('confirmpassword')
+		if (this.state.password !== this.state.confirmpassword) errors.push('passwordMisMatch')
+		if (this.state.year  === '') errors.push('year')
+		if (this.state.day === '') errors.push('day')
+		if (this.state.month === '') errors.push('month')
+		if (this.state.skill === '') errors.push('skill')
+		if (this.state.totalPlaying === 0) errors.push('playTime')
+		
+		
+		// if (this.state.checkedItems.size === 0) errors.push('items')
+
+		this.setState({
+			errors: errors
+		})
+		return errors.length == 0
+
+	}
+
+  render() {
+
+    const {playingTime, errors} = this.state
+    console.log(this.state);
     return (
-      <div className={styles.box_container}>
-        <div className={styles.box_controller}>
-          <div className={styles2.ui_top}>
-            <h2>Profile Page</h2>
-            <div className={styles2.form_top}>
-              <div className={styles.form_row} name="user">
-                <label>user</label><input onChange={this.handleChange} type="text" id="user" data-name="user" placeholder={this.state.user} />
-              </div>
-              <div className={styles2.form_row} name="password">
-                <label>password</label><input onChange={this.handleChange} type="password" id="password" data-name="password" placeholder={this.state.password} />
-              </div>
-              <div className={styles2.form_row} name="confirmpassword">
-                <label>confirm</label><input onChange={this.handleChange} type="password" id="confirmpassword" data-name="confirmpassword" placeholder={this.state.confirmpassword} />
-              </div>
-              {/* <div className="form-row">
-						<label>skill</label>
-						<input type="radio" data-name="skill" name="skill" value="beginner" checked={true}>beginner</input>
-						<input type="radio" data-name="skill" name="skill" value="intermediate" checked={false}>intermediate</input>
-						<input type="radio" data-name="skill" name="skill" value="advanced" checked={false}>advanced</input>
-					</div> */}
-              <div className={styles2.form_row} name="birthday">
-                <label>Birthday</label>
-                <input onChange={this.handleChange} type="number" min="1900" max="2100" id="year" data-name="year" placeholder={this.state.year} />
-                <select onChange={this.handleChange} id="month" data-name="month">
-                  <option value="Jan">Jan</option>
-                  <option value="Feb">Feb</option>
-                  <option value="Mar">Mar</option>
-                  <option value="Apr">Apr</option>
-                  <option value="May">May</option>
-                  <option value="Jun">Jun</option>
-                  <option value="Jul">Jul</option>
-                  <option value="Aug">Aug</option>
-                  <option value="Sep">Sep</option>
-                  <option value="Oct">Oct</option>
-                  <option value="Nov">Nov</option>
-                  <option value="Dec">Dec</option>
-                </select>
-                <input onChange={this.handleChange} type="number" min="1" max="31" id="day" data-name="day" placeholder={this.state.day} />
-              </div>
-              {/* <div className="form-row" name="plantoplay">
-						<label>I plan to play:</label>
-						<input type="checkbox" data-name="playmorning" value="yes" >morning</input>
-						<input type="checkbox" data-name="playafternoon" value="yes" >afternoon</input>
-						<input type="checkbox" data-name="playevening" value="yes" >evening</input>
-					</div> */}
-              <div className={styles2.form_row}>
-                <input type="submit" id="updateProfileSubmit" value="Update" onClick={this.api_profile.bind(this)} onclick="gui_profile();" />
-              </div>
-              {/* <thead>
-            <div class="form-errors" colspan="2"></div>
-          </thead> */}
+
+			<div className="card">
+				<h2>Register</h2>
+				<div className="card" style={{padding: '2%',  margin: '2%'}}>
+          <form onSubmit={this.handleSubmit}>
+
+            <div name="user">
+              <label 
+              className={(errors.includes('user') || errors.includes('userTaken'))? 'red-text darken-1' : ''} >
+              User {errors.includes('userTaken')? '(Username Taken, Pick a different one)': ''}</label>
+              <input 
+              value={this.state.user}
+              onChange={this.handleChange} 
+              type="text" name="user" 
+              placeholder="User Name" />
             </div>
-          </div>
-        </div>
-      </div>
+
+            <div  name="password">
+							<label className={errors.includes('password')? 'red-text darken-1' : ''}>Password</label>
+              <input 
+              value={this.state.password}
+              onChange={this.handleChange} type="password" name="password" placeholder="Password" />
+						</div>
+
+            <div name="confirmpassword">
+							<label
+							 className=
+							{(errors.includes('confirmpassword') ||errors.includes('passwordMisMatch') )? 'red-text darken-1' : ''}
+							>
+							Confirm{errors.includes('passwordMisMatch')? '(Password doesnt match)' : ''}
+							</label>
+							<input
+              value={this.state.confirmpassword}
+							onChange={this.handleChange} 
+							type="password" 
+							name="confirmpassword" 
+							placeholder= "Confirm Password" />
+						</div>
+
+            <div className="">
+							
+							<label 
+							className={errors.includes('skill')? 'red-text darken-1' : ''}
+							style={{fontSize: '25sp', fontWeight: 'bold'}}>Skill</label>
+							<div className="">
+								<p>
+									<label>
+										<input 
+										onChange={this.handleChange}
+										name="skill" 
+										type="radio" 
+										value="beginner"
+										checked={this.state.skill == 'beginner'} />
+										<span>Beginner</span>
+									</label>
+								</p>
+							</div>
+							<div className="">
+								<p>
+									<label>
+										<input 
+										onChange={this.handleChange}
+										name="skill" 
+										type="radio"
+										value="intermediate"
+										checked={this.state.skill == 'intermediate'} />
+										<span>Intermediate</span>
+									</label>
+								</p>
+							</div>
+							<div className="">
+								<p>
+									<label>
+										<input 
+										onChange={this.handleChange}
+										name="skill" 
+										type="radio" 
+										value="advanced"
+										checked={this.state.skill == 'advanced'} />
+										<span>Advance</span>
+									</label>
+								</p>
+							</div>
+							
+						</div>
+
+            <div className="row">
+							<div className="col s4">
+								<label
+								className={errors.includes('month')? 'red-text darken-1' : ''}
+								>Month</label>
+								<select value={this.state.month} name="month" onChange={this.handleChange} className="browser-default">
+									<option value="" disabled selected>Month</option>
+									<option value="Jan">Jan</option>
+									<option value="Feb">Feb</option>
+									<option value="Mar">Mar</option>
+									<option value="Apr">Apr</option>
+									<option value="May">May</option>
+									<option value="Jun">Jun</option>
+									<option value="Jul">Jul</option>
+									<option value="Aug">Aug</option>
+									<option value="Sep">Sep</option>
+									<option value="Oct">Oct</option>
+									<option value="Nov">Nov</option>
+									<option value="Dec">Dec</option>
+								</select>
+							</div>
+							
+							<div className="col s4">
+								<label
+								className={errors.includes('day')? 'red-text darken-1' : ''}
+								>Day</label>
+                <input 
+                value={this.state.day}
+                onChange={this.handleChange} type="number" min="1" max="31" name="day" placeholder="day" />
+							</div>
+
+							<div className="col s4">
+								<label
+								className={errors.includes('year')? 'red-text darken-1' : ''}
+								>Year</label>
+                <input 
+                value={this.state.year}
+								onChange={this.handleChange} 
+								type="number" min="1900" max="2100" name="year" placeholder="year" />
+							</div>
+						</div>
+
+            <div className="row">
+							<label
+							className={errors.includes('playTime')? 'red-text darken-1' : ''}
+							>I plan to play:</label>
+							{
+								Object.keys(playingTime).map(item => {
+                  console.log(item)
+                  
+                  return (
+									<Checkbox 
+										name={playingTime[item].name} 
+										checked={playingTime[item].checked}
+										onChange={this.handleChangecheck} 
+									/>
+                  )
+                })
+							}
+						</div>
+            <div >
+							<input 
+							className="waves-effect blue btn-small"
+							type="submit" 
+							id="registerSubmit" 
+							value="Register" 
+							 />
+						</div>
+
+          </form>
+				</div>
+			</div>
     );
   }
 }
