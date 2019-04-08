@@ -201,7 +201,7 @@ class Profile extends Component {
 				<div className="container">
 					<label 
 					className="light-green accent-3"
-					style={{fontSize: '5em', fontWeight: 'bold'}} >
+					style={{fontSize: '1em', fontWeight: 'bold'}} >
 					{this.state.success}</label>
 				<div className="card" style={{padding: '2%',  margin: '2%'}}>
           <form onSubmit={this.handleSubmit}>
