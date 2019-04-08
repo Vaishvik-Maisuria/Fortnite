@@ -134,6 +134,11 @@ function handleClientAction(data, ws){
 			//now we need to set the direction with a mainStage method
 			mainStage.setDirectionPlayer(data.x, data.y, data.playerIndex)
 			break
+		case 'touchClick':
+			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
+			mainStage.mouseClickPLayer(data.x, data.y, data.playerIndex)
+			break
+
 		case 'mouseMovement':
 			mainStage.mouseMovePlayer(data.x, data.y, data.playerIndex)
 			break

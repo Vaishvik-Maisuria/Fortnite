@@ -59,24 +59,58 @@ class Game extends Component {
     };
   }
 
-
-  handleWindowSizeChange = () => {
-    this.setState({ width: window.innerWidth });
-  };
-
   componentDidCatch(error, info) {
     this.setState({ hasError: true });
   }
 
+  componentDidMount() {
+    if (this.state.width <= 500) {
+      this.setState({
+        isMobile: true
+      })
+    };
+
+    if (this.state.playerDead) {
+      this.props.goToStats()
+    }
+    const canvas = this.refs.canvas;
+
+    this.initializeSocketOperations(canvas);
+
+    document.addEventListener('keydown', this.handleKeyPress)
+    canvas.addEventListener("click", this.handleMouseClick);
+    canvas.addEventListener("mousemove", this.handleMouseMovement);
+
+    // // touch listensers 
+    // canvas.addEventListener('touchmove', this.handleTouchMove)
+    canvas.addEventListener('touchstart', this.handleTouchStart);
+
+    // device motion 
+    setTimeout(() => { window.addEventListener('devicemotion', this.handleDeviceMotion, true);}, 200)
+    window.addEventListener('devicemotion', this.handleDeviceMotion, true);
+
+    var intVal = setInterval(() => {
+      
+      this.sendData(this.state.mouseMovementData)
+    }, 400)
+
+    this.setState({
+      mouseInterval: intVal
+    })
+
+  }
+
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
-    const socket = new WebSocket("ws://localhost:8001")
+    const socket = new WebSocket("ws://142.1.2.146:8001")
     setTimeout(() => { }, 1500)
 
     this.setState({
       socket: socket
     })
   }
+
+
 
   componentWillUnmount() {
     clearInterval(this.state.mouseInterval)
@@ -93,16 +127,19 @@ class Game extends Component {
       playerDead: true,
       totalKills: 0
     })
-    
+
     setTimeout(this.state.socket.close(), 3000)
 
     this.updateDeathsDatabase();
 
     window.removeEventListener('resize', this.handleWindowSizeChange);
     window.removeEventListener('devicemotion', this.handleDeviceMotion, true);
-
-
   }
+
+  handleWindowSizeChange = () => {
+    this.setState({ width: window.innerWidth });
+  };
+
 
   updateKillsDatabase = () => {
 
@@ -141,48 +178,13 @@ class Game extends Component {
     });
   }
 
-  componentDidMount() {
-    if (this.state.width <= 500) {
-      this.setState({
-        isMobile: true
-      })
-    };
-
-    if (this.state.playerDead) {
-      this.props.goToStats()
-    }
-    const canvas = this.refs.canvas;
-
-    this.initializeSocketOperations(canvas);
-
-    document.addEventListener('keydown', this.handleKeyPress)
-    canvas.addEventListener("click", this.handleMouseClick);
-    canvas.addEventListener("mousemove", this.handleMouseMovement);
-
-    // // touch listensers 
-    canvas.addEventListener('touchmove', this.handleTouchMove)
-    canvas.addEventListener('touchstart', this.handleTouchStart);
-
-    // device motion 
-    window.addEventListener('devicemotion', this.handleDeviceMotion, true);
-
-    var intVal = setInterval(() => {
-      this.sendData(this.state.mouseMovementData)
-    }, 400)
-
-    this.setState({
-      mouseInterval: intVal
-    })
-
-  }
-
   handleDeviceMotion = event => {
     const { acceleration, accelerationIncludingGravity, interval, rotationRate } = event;
     this.setState({ acceleration, accelerationIncludingGravity, interval, rotationRate })
 
     var x = Math.round(accelerationIncludingGravity.x) / 2;
     var y = Math.round(accelerationIncludingGravity.y) / 2;
-    var z = Math.round(accelerationIncludingGravity.z);
+    var z = Math.round(accelerationIncludingGravity.z) /2 ;
     const keyPressData = {
       x: -x,
       y: y,
@@ -190,11 +192,13 @@ class Game extends Component {
       playerIndex: this.state.playerIndex,
       type: 'none'
     }
+    
     if (z > 7) {
       keyPressData.type = "pickup"
     } else {
       keyPressData.type = 'movement'
     }
+
     this.setState({
       mouseMovementData: keyPressData,
     })
@@ -208,7 +212,7 @@ class Game extends Component {
     const mouseMovementData = {
       playerIndex: this.state.playerIndex,
       id: this.state.id,
-      type: 'mouseClick',
+      type: 'touchClick',
       x: mousePos.x,
       y: mousePos.y
     }
@@ -217,24 +221,9 @@ class Game extends Component {
       player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player, this.state.windowWidth, this.state.windowHeight)
     })
     this.sendData(mouseMovementData)
+   
   }
 
-  handleTouchMove = (event) => {
-    event.preventDefault();
-    let fingerx = event.touches[0].pageX;
-    let fingery = event.touches[0].pageY;
-    const mouseMovementData = {
-      playerIndex: this.state.playerIndex,
-      id: this.state.id,
-      type: 'mouseMovement',
-      x: fingerx,
-      y: fingery
-    }
-    this.setState({
-      mouseMovementData: mouseMovementData,
-      player: mouseMove(mouseMovementData.x, mouseMovementData.y, this.state.player)
-    })
-  }
 
   handleMouseClick = (event) => {
     const canvas = this.refs.canvas;
@@ -283,7 +272,7 @@ class Game extends Component {
       } else {
         keyPressData.type = 'movement'
       }
-     
+
       this.sendData(keyPressData)
     }
   }
@@ -293,7 +282,7 @@ class Game extends Component {
       const data = {
         type: 'userName',
         id: this.state.id
-        
+
       }
       this.setState({
         socketOpen: true
@@ -355,7 +344,7 @@ class Game extends Component {
             //change the position
             //we only want the turretDirection
             var temp = config[playerIndex]
-
+            temp.turretDirection = this.state.player.turretDirection
             if (!this.state.isMobile) {
               temp.turretDirection = this.state.player.turretDirection
             }
@@ -388,11 +377,11 @@ class Game extends Component {
 
   sendData = (data) => {
     const sData = JSON.stringify(data)
-    if (this.state.socketOpen){
+    if (this.state.socketOpen) {
       this.state.socket.send(sData)
     }
-      // this.state.socket.onopen = function (event) {
-      
+    // this.state.socket.onopen = function (event) {
+
 
   }
   render() {
