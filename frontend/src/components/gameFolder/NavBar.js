@@ -134,6 +134,7 @@ class NavBar extends Component {
     };
 
     handleMobileMenuOpen = event => {
+        
         this.setState({ mobileMoreAnchorEl: event.currentTarget });
     };
 
@@ -146,7 +147,6 @@ class NavBar extends Component {
         const { classes } = this.props;
         const isMenuOpen = Boolean(anchorEl);
         const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
         const renderMobileMenu = (
             <Menu
                 anchorEl={mobileMoreAnchorEl}
@@ -155,65 +155,32 @@ class NavBar extends Component {
                 open={isMobileMenuOpen}
                 onClose={this.handleMenuClose}
             >
-                <NavMenuItem 
-                    clickFunc={this.handleMobileMenuClose}
-                    Comp={<Accessibility />}
-                    name={'Players'}
-                    compName={'Stats'}
-                />
-
-                <NavMenuItem 
-                    clickFunc={this.handlePlayMenuOpen}
-                    Comp={<PlayArrow />}
-                    name={'Play'}
-                    compName={'Game'}
-                />
-
-                <NavMenuItem 
-                    clickFunc={this.handleInstructionMenuOpen}
-                    Comp={<Description />}
-                    name={'Instruction'}
-                    compName={'Instruction'}
-                />
-
-                <NavMenuItem 
-                    clickFunc={this.handleStatsMenuOpen}
-                    Comp={<ListAlt />}
-                    name={'Stats'}
-                    compName={'Stats'}
-                />
-
-                
-                <NavMenuItem 
-                    clickFunc={this.handleProfileMenuOpen}
-                    Comp={<AccountCircle />}
-                    name={'Profile'}
-                    compName={'Profile'}
-                />
-
-                <NavMenuItem 
-                    clickFunc={this.handleLogOutMenuOpen}
-                    Comp={<FullscreenExitRounded />}
-                    name={'Logout'}
-                    compName={'Logout'}
-                />
-                {/* <MenuItem onClick={this.handlePlayMenuOpen}>
+                <MenuItem onClick={this.handleMobileMenuClose}>
+                    {/* Number of Players */}
+                    <IconButton color="inherit">
+                        <Badge badgeContent={1} color="secondary">
+                            <Accessibility />
+                        </Badge>
+                    </IconButton>
+                    <p>Players</p>
+                </MenuItem>
+                <MenuItem onClick={this.handlePlayMenuOpen}>
                     <IconButton onClick={this.handlePlayMenuOpen} name="Game" color="inherit">
                         <Badge color="secondary">
                             <PlayArrow />
                         </Badge>
                     </IconButton>
                     <p>Play</p>
-                </MenuItem> */}
-                {/* <MenuItem onClick={this.handleInstructionMenuOpen}>
+                </MenuItem>
+                <MenuItem onClick={this.handleInstructionMenuOpen}>
                     <IconButton onClick={this.handleInstructionMenuOpen} name="Instruction" color="inherit">
                         <Badge color="secondary">
                             <Description />
                         </Badge>
                     </IconButton>
                     <p>Instruction</p>
-                </MenuItem> */}
-                {/* <MenuItem onClick={this.handleStatsMenuOpen}>
+                </MenuItem>
+                <MenuItem onClick={this.handleStatsMenuOpen}>
                     <IconButton onClick={this.handleStatsMenuOpen} name="Stats" color="inherit">
                         <Badge badgeContent={1} color="secondary">
 
@@ -223,24 +190,24 @@ class NavBar extends Component {
                     </IconButton>
 
                     <p>Stats</p>
-                </MenuItem> */}
-                {/* <MenuItem onClick={this.handleProfileMenuOpen}>
+                </MenuItem>
+                <MenuItem onClick={this.handleProfileMenuOpen}>
                     <IconButton aria-haspopup="true" onClick={this.handleProfileMenuOpen} name="Profile" color="inherit">
                         <AccountCircle />
 
                     </IconButton>
                     <p>Profile</p>
-                </MenuItem> */}
-                {/* <MenuItem onClick={this.handleLogOutMenuOpen}>
+                </MenuItem>
+                <MenuItem onClick={this.handleLogOutMenuOpen}>
                     <IconButton aria-haspopup="true" onClick={this.handleLogOutMenuOpen} name="LogOut" color="inherit">
                         <FullscreenExitRounded />
 
                     </IconButton>
                     <p>Logout</p>
-                </MenuItem> */}
+                </MenuItem>
             </Menu>
         );
-
+        
         return (
             <div className={classes.root}>
 
@@ -252,18 +219,17 @@ class NavBar extends Component {
                         <div className={classes.grow} />
                         <div className={classes.sectionDesktop}>
                             {/* Number of Players */}
-                            <IconButton color="inherit">
+                            {/* <IconButton color="inherit">
                                 <Badge badgeContent={1} color="secondary">
                                     <Accessibility />
                                     Players
                                     </Badge>
-                            </IconButton>
+                            </IconButton> */}
 
                             {/* Play Button */}
                             <DesktopMenuItem 
                                 clickFunc={this.handlePlayMenuOpen}
-                                name={'Play'}
-                                compName={'Game'}
+                                name={'Play'} compName={'Game'}
                                 Comp={() => ( <PlayArrow /> )}
                             />
 
@@ -295,43 +261,6 @@ class NavBar extends Component {
                                 compName={'LogOut'}
                                 Comp={() => ( <FullscreenExitRounded /> )}
                             />
-
-                            {/* <IconButton onClick={this.handlePlayMenuOpen} name="Game" color="inherit">
-                                <Badge color="secondary">
-                                    <PlayArrow />
-                                    Play
-                                    </Badge>
-                            </IconButton> */}
-
-                            {/* Instruction */}
-                            {/* <IconButton onClick={this.handleInstructionMenuOpen} name="Instruction" color="inherit">
-                                <Badge color="secondary">
-                                    <Description />
-                                    Instruction
-                                </Badge>
-                            </IconButton> */}
-
-                            {/* States */}
-                            {/* <IconButton onClick={this.handleStatsMenuOpen} name="Stats" color="inherit">
-                                <Badge badgeContent={1} color="secondary">
-
-                                    <ListAlt />
-                                    Stats
-                                </Badge>
-                            </IconButton> */}
-
-                            {/* Profile */}
-                            {/* <IconButton aria-haspopup="true" onClick={this.handleProfileMenuOpen} name="Profile" color="inherit">
-                                <AccountCircle />
-                                Profile
-                            </IconButton> */}
-
-                            {/* Logout */}
-                            {/* <IconButton aria-haspopup="true" onClick={this.handleLogOutMenuOpen} name="LogOut" color="inherit">
-                                <FullscreenExitRounded />
-                                Logout
-                            </IconButton> */}
-
                         </div>
                         <div className={classes.sectionMobile}>
                             <IconButton
@@ -342,6 +271,7 @@ class NavBar extends Component {
                                 <MoreIcon />
                             </IconButton>
                         </div>
+
                     </Toolbar>
                 </AppBar>
                 
