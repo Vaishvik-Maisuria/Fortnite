@@ -25,6 +25,13 @@ class Instructions extends Component {
               <li> Aim with your mouse </li>
               <li> Mouse click fires </li>
             </ul>
+            <h1>Device Movement</h1>
+            <ul>
+              <li> Move with tilting your device left to right to move to the direction of left to right. Similarly up and down</li>
+              <li> Boxes restore amunition and health, move next to them and shake the phone up and down </li>
+              <li> Aim and fire with your touching your screen </li>
+             
+            </ul>
           </div>
         </div>
  

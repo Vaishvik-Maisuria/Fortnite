@@ -198,7 +198,7 @@ class Game extends Component {
     } else {
       keyPressData.type = 'movement'
     }
-
+    this.sendData(keyPressData)
     this.setState({
       mouseMovementData: keyPressData,
     })
